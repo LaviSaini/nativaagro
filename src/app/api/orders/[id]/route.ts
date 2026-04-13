@@ -23,7 +23,7 @@ export async function GET(
 
     const items = order.items || [];
     const productIds = [...new Set(items.map((i: { productId: string }) => i.productId))].filter(
-      (id: string) => ObjectId.isValid(id)
+      (id: unknown): id is string => ObjectId.isValid(id as string)
     );
     const products = productIds.length
       ? await db

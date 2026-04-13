@@ -30,8 +30,8 @@ export async function GET(request: Request) {
       ]);
 
     const orders = await db.collection("orders").find({}).toArray();
-    const totalRevenue = orders.reduce((sum: number, o: { total?: number }) => sum + (o.total || 0), 0);
-    const pendingOrders = orders.filter((o: { status?: string }) =>
+    const totalRevenue = orders.reduce((sum: number, o: { total?: number } & Record<string, unknown>) => sum + (o.total || 0), 0);
+    const pendingOrders = orders.filter((o: { status?: string } & Record<string, unknown>) =>
       ["pending", "processing", "shipped"].includes(o.status || "")
     ).length;
 
