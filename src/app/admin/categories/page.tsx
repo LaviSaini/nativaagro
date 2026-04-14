@@ -1,32 +1,45 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { adminFetch } from "@/lib/admin-api";
+import { AdminFlash } from "@/components/admin/AdminFlash";
+import { AdminImageField } from "@/components/admin/AdminImageField";
 
 interface Category {
   _id: string;
   name: string;
   slug: string;
   icon?: string;
+  image?: string;
 }
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", slug: "", description: "", icon: "" });
+  const [form, setForm] = useState({ name: "", slug: "", description: "", icon: "", image: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   function loadCategories() {
+    setLoading(true);
+    setError("");
     adminFetch("/api/admin/categories")
-      .then((r) => (r.ok ? r.json() : []))
-      .then(setCategories);
+      .then(async (r) => {
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          throw new Error(j.error || "Failed to load categories");
+        }
+        return r.json();
+      })
+      .then(setCategories)
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
     loadCategories();
-    setLoading(false);
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,7 +56,7 @@ export default function AdminCategoriesPage() {
         setError(data.error || "Failed to create");
         return;
       }
-      setForm({ name: "", slug: "", description: "", icon: "" });
+      setForm({ name: "", slug: "", description: "", icon: "", image: "" });
       setShowForm(false);
       loadCategories();
     } catch {
@@ -63,6 +76,7 @@ export default function AdminCategoriesPage() {
 
   return (
     <div>
+      {error ? <AdminFlash type="error">{error}</AdminFlash> : null}
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-zinc-900">Categories</h1>
         <button
@@ -129,6 +143,15 @@ export default function AdminCategoriesPage() {
               />
             </div>
           </div>
+          <div className="mt-4">
+            <AdminImageField
+              label="Category image"
+              folder="categories"
+              value={form.image}
+              onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+              helpText="Optional hero or tile image under public/categories."
+            />
+          </div>
           <button
             type="submit"
             disabled={saving}
@@ -157,6 +180,9 @@ export default function AdminCategoriesPage() {
                   Slug
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-zinc-700">
+                  Image
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-zinc-700">
                   Icon
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-medium text-zinc-700">
@@ -171,6 +197,22 @@ export default function AdminCategoriesPage() {
                     {c.name}
                   </td>
                   <td className="px-4 py-3 text-zinc-600">{c.slug}</td>
+                  <td className="px-4 py-3">
+                    {c.image ? (
+                      <div className="relative h-10 w-10 overflow-hidden rounded-md border border-zinc-200 bg-zinc-50">
+                        <Image
+                          src={c.image}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="40px"
+                          unoptimized={c.image.endsWith(".svg")}
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-zinc-400">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-xl">{c.icon || "—"}</td>
                   <td className="px-4 py-3 text-right">
                     <button

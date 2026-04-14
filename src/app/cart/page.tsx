@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getSessionId } from "@/lib/checkout";
+import Container from "@/components/ui/Container";
+import { ButtonLink } from "@/components/ui/Button";
 
 interface CartItem {
   productId: string;
@@ -17,6 +19,7 @@ interface CartData {
 export default function CartPage() {
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [promo, setPromo] = useState("");
 
   useEffect(() => {
     const sessionId = getSessionId();
@@ -29,11 +32,13 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-50 px-4 py-12">
-        <div className="mx-auto max-w-4xl">
-          <p className="text-zinc-600">Loading cart...</p>
-        </div>
-      </div>
+      <main className="bg-white">
+        <Container>
+          <div className="py-14">
+            <p className="text-zinc-600">Loading cart...</p>
+          </div>
+        </Container>
+      </main>
     );
   }
 
@@ -45,73 +50,121 @@ export default function CartPage() {
   );
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-4xl px-4 py-12">
-        <h1 className="mb-8 text-3xl font-bold text-zinc-900">Your Cart</h1>
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
+    <main className="bg-white">
+      <Container>
+        <div className="py-12">
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">
+            Shopping Cart
+          </h1>
+
           {isEmpty ? (
-            <>
-              <p className="text-zinc-600">
-                Your cart is empty. Add MONGODB_URI to .env.local and add
-                products to see them here.
-              </p>
-              <Link
-                href="/products"
-                className="mt-6 inline-block rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white hover:bg-zinc-800"
-              >
-                Browse Products
-              </Link>
-            </>
+            <div className="mt-8 rounded-3xl border border-zinc-200 bg-zinc-50 p-10">
+              <p className="text-sm text-zinc-600">Your cart is empty.</p>
+              <div className="mt-6">
+                <ButtonLink href="/products" variant="outline">
+                  Browse products
+                </ButtonLink>
+              </div>
+            </div>
           ) : (
-            <>
-              <ul className="divide-y divide-zinc-200">
-                {items.map((item) => (
-                  <li
-                    key={item.productId}
-                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-                  >
-                    <div>
-                      <p className="font-medium text-zinc-900">
-                        {item.product?.name || "Product"}
-                      </p>
-                      <p className="text-sm text-zinc-500">
-                        Qty: {item.quantity} × $
-                        {item.product?.price?.toFixed(2) || "0.00"}
-                      </p>
-                    </div>
-                    <p className="font-medium text-zinc-900">
-                      $
-                      {(
-                        (item.product?.price || 0) * item.quantity
-                      ).toFixed(2)}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 border-t border-zinc-200 pt-6">
-                <div className="flex justify-between text-lg font-semibold text-zinc-900">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+            <div className="mt-10 grid gap-8 md:grid-cols-12">
+              <div className="md:col-span-7">
+                <div className="rounded-3xl border border-zinc-200 bg-white p-6">
+                  <ul className="divide-y divide-zinc-200">
+                    {items.map((item) => (
+                      <li key={item.productId} className="py-5 first:pt-0 last:pb-0">
+                        <div className="flex items-start gap-4">
+                          <div className="h-20 w-20 shrink-0 rounded-2xl bg-zinc-100" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold tracking-wide text-zinc-900">
+                              {item.product?.name || "Product"}
+                            </p>
+                            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-600">
+                              <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs">
+                                480g
+                              </span>
+                              <span className="text-xs text-zinc-500">
+                                Qty: {item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-sm font-medium text-zinc-900">
+                            ₹{Math.round((item.product?.price || 0) * item.quantity)}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-              <div className="mt-6 flex gap-4">
-                <Link
-                  href="/products"
-                  className="rounded-lg border border-zinc-300 px-6 py-3 font-medium text-zinc-700 hover:bg-zinc-100"
-                >
-                  Continue Shopping
-                </Link>
-                <Link
-                  href="/checkout"
-                  className="rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white hover:bg-zinc-800"
-                >
-                  Checkout
-                </Link>
+
+              <div className="md:col-span-5">
+                <div className="rounded-3xl border border-zinc-200 bg-white p-6">
+                  <h2 className="text-lg font-semibold tracking-wide text-zinc-900">
+                    Order Summary
+                  </h2>
+
+                  <div className="mt-6">
+                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+                      Discount code / Promo code
+                    </p>
+                    <div className="mt-3 flex gap-2">
+                      <input
+                        value={promo}
+                        onChange={(e) => setPromo(e.target.value)}
+                        placeholder="Enter Code"
+                        className="w-full rounded-full border border-zinc-300 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // placeholder: promo logic can be added later
+                        }}
+                        className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-3 border-t border-zinc-200 pt-6 text-sm">
+                    <div className="flex justify-between text-zinc-700">
+                      <span>Subtotal</span>
+                      <span>₹{Math.round(subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-600">
+                      <span>Estimated Tax</span>
+                      <span>₹0</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-600">
+                      <span>Estimated shipping &amp; Handling</span>
+                      <span>₹0</span>
+                    </div>
+                    <div className="flex justify-between pt-2 text-base font-semibold text-zinc-900">
+                      <span>Total</span>
+                      <span>₹{Math.round(subtotal)}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <ButtonLink href="/checkout" className="w-full">
+                      Checkout
+                    </ButtonLink>
+                    <div className="mt-3 text-center">
+                      <Link
+                        href="/products"
+                        className="text-sm text-zinc-600 hover:text-zinc-900"
+                      >
+                        Continue shopping
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </>
+            </div>
           )}
         </div>
-      </div>
-    </div>
+      </Container>
+    </main>
   );
 }

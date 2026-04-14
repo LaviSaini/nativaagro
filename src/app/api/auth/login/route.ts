@@ -5,6 +5,7 @@ import {
   DEV_ADMIN_PASSWORD,
   DEV_ADMIN_ID,
 } from "@/lib/admin-constants";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +43,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // TODO: Verify password with bcrypt
+    const ok = await bcrypt.compare(password, user.passwordHash || "");
+    if (!ok) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+    if (user.disabled) {
+      return NextResponse.json(
+        { error: "This account has been disabled" },
+        { status: 403 }
+      );
+    }
     return NextResponse.json({
       user: {
         _id: user._id.toString(),
@@ -50,7 +60,7 @@ export async function POST(request: Request) {
         name: user.name,
         role: user.role || "user",
       },
-      token: "placeholder-token", // TODO: JWT
+      token: `user:${user._id.toString()}`,
     });
   } catch {
     return NextResponse.json(

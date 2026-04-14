@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { setAuthToken, setAuthUser } from "@/lib/auth";
+import Container from "@/components/ui/Container";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 function LoginForm() {
   const router = useRouter();
@@ -53,16 +55,19 @@ function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm"
+      className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm"
     >
       {error && (
-        <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <p className="mb-4 rounded-2xl bg-red-50 p-4 text-sm text-red-700">
           {error}
         </p>
       )}
       <div className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-zinc-700">
+          <label
+            htmlFor="email"
+            className="text-xs font-medium tracking-wide text-zinc-700"
+          >
             Email
           </label>
           <input
@@ -70,34 +75,43 @@ function LoginForm() {
             name="email"
             type="email"
             required
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+            className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-zinc-700">
-            Password
-          </label>
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="password"
+              className="text-xs font-medium tracking-wide text-zinc-700"
+            >
+              Password
+            </label>
+            <Link
+              href="/auth/forgot-password"
+              className="text-xs text-zinc-600 hover:text-zinc-900"
+            >
+              Forgot Password?
+            </Link>
+          </div>
           <input
             id="password"
             name="password"
             type="password"
             required
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+            className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
           />
         </div>
       </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-6 w-full rounded-lg bg-zinc-900 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-      >
-        {loading ? "Logging in..." : "Login"}
-      </button>
+      <div className="mt-6">
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Logging in..." : "Login"}
+        </Button>
+      </div>
       <p className="mt-4 text-center text-sm text-zinc-600">
         Don&apos;t have an account?{" "}
         <Link
           href={`/auth/register${returnTo !== "/" ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`}
-          className="text-blue-600 hover:underline"
+          className="text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900"
         >
           Sign up
         </Link>
@@ -108,13 +122,29 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-md px-4 py-16">
-        <h1 className="mb-8 text-3xl font-bold text-zinc-900">Login</h1>
-        <Suspense>
-          <LoginForm />
-        </Suspense>
-      </div>
-    </div>
+    <main className="bg-white">
+      <Container>
+        <div className="mx-auto max-w-md py-16">
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">
+            Login
+          </h1>
+          <p className="mt-3 text-sm text-zinc-600">
+            Welcome back. Please enter your details.
+          </p>
+
+          <div className="mt-8">
+            <Suspense>
+              <LoginForm />
+            </Suspense>
+          </div>
+
+          <div className="mt-6">
+            <ButtonLink href="/auth/register" variant="outline" className="w-full">
+              Create account
+            </ButtonLink>
+          </div>
+        </div>
+      </Container>
+    </main>
   );
 }

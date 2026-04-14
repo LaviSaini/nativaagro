@@ -35,6 +35,11 @@ export function getAuthUser(): AuthUser | null {
   return null;
 }
 
+export function getAuthedUserId(): string | null {
+  const u = getAuthUser();
+  return u?._id || null;
+}
+
 export function clearAuthToken() {
   if (typeof window !== "undefined") {
     localStorage.removeItem(TOKEN_KEY);

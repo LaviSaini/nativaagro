@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { adminFetch } from "@/lib/admin-api";
+import { AdminFlash } from "@/components/admin/AdminFlash";
 import {
   BarChart,
   Bar,
@@ -38,6 +39,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ status: "", awb_code: "" });
 
@@ -47,9 +49,20 @@ export default function AdminOrdersPage() {
     if (periodFilter) params.set("period", periodFilter);
     const url = `/api/admin/orders${params.toString() ? `?${params}` : ""}`;
     setLoading(true);
+    setError(null);
     adminFetch(url)
-      .then((r) => (r.ok ? r.json() : []))
+      .then(async (r) => {
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          throw new Error(j.error || "Failed to load orders");
+        }
+        return r.json();
+      })
       .then(setOrders)
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "Failed to load orders");
+        setOrders([]);
+      })
       .finally(() => setLoading(false));
   }, [statusFilter, periodFilter]);
 
@@ -75,6 +88,9 @@ export default function AdminOrdersPage() {
     if (res.ok) {
       setEditing(null);
       loadOrders();
+    } else {
+      const j = await res.json().catch(() => ({}));
+      alert(j.error || "Update failed");
     }
   }
 
@@ -87,6 +103,7 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
+      {error ? <AdminFlash type="error">{error}</AdminFlash> : null}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-zinc-900">Orders</h1>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">

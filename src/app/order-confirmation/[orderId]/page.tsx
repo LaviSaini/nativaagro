@@ -1,4 +1,5 @@
-import Link from "next/link";
+import Container from "@/components/ui/Container";
+import { ButtonLink } from "@/components/ui/Button";
 
 async function getOrder(orderId: string) {
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -23,17 +24,20 @@ export default async function OrderConfirmationPage({
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-zinc-50 px-4 py-12">
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-2xl font-bold text-zinc-900">Order not found</h1>
-          <Link
-            href="/"
-            className="mt-4 inline-block text-blue-600 hover:underline"
-          >
-            Back to home
-          </Link>
-        </div>
-      </div>
+      <main className="bg-white">
+        <Container>
+          <div className="py-20 text-center">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+              Order not found
+            </h1>
+            <div className="mt-6">
+              <ButtonLink href="/" variant="outline">
+                Back to home
+              </ButtonLink>
+            </div>
+          </div>
+        </Container>
+      </main>
     );
   }
 
@@ -42,102 +46,130 @@ export default async function OrderConfirmationPage({
   const address = order.shippingAddress || {};
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm text-center">
-          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg
-              className="h-8 w-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-zinc-900">
-            Order Placed Successfully!
-          </h1>
-          <p className="mt-2 text-zinc-600">
-            Thank you for your order. We&apos;ll send you a confirmation email
-            shortly.
-          </p>
-
-          <div className="mt-8 rounded-lg bg-zinc-50 p-6 text-left">
-            <p className="text-sm font-medium text-zinc-900">
-              Order ID: <span className="font-mono">{order._id}</span>
-            </p>
-            <p className="mt-2 text-sm text-zinc-600">
-              Status: <span className="capitalize">{order.status}</span>
+    <main className="bg-white">
+      <Container>
+        <div className="py-12">
+          <div className="mx-auto max-w-5xl">
+            <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">
+              Congratulations on your order!
+            </h1>
+            <p className="mt-3 text-sm text-zinc-600">
+              While you wait for your order to arrive, why not start a habit of a short breathing exercise to help you feel relaxed.
             </p>
 
-            <div className="mt-4 border-t border-zinc-200 pt-4">
-              <h3 className="text-sm font-medium text-zinc-900">
-                Shipping to
-              </h3>
-              <p className="mt-1 text-sm text-zinc-600">
-                {address.fullName}
-                <br />
-                {address.address}
-                <br />
-                {address.city}, {address.state} {address.zip}
-                <br />
-                {address.country}
-              </p>
-            </div>
+            <div className="mt-10 grid gap-8 md:grid-cols-12">
+              <div className="md:col-span-7">
+                <div className="rounded-3xl border border-zinc-200 bg-white p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm text-zinc-600">
+                      Orders · ID <span className="font-mono">{String(order._id).slice(-10)}</span>
+                    </p>
+                    <div className="flex gap-2">
+                      <ButtonLink href={`/track-order/${order._id}`} variant="outline" size="sm">
+                        Track order
+                      </ButtonLink>
+                      <ButtonLink href="/account/orders" size="sm">
+                        Orders
+                      </ButtonLink>
+                    </div>
+                  </div>
 
-            <div className="mt-4 border-t border-zinc-200 pt-4">
-              <h3 className="text-sm font-medium text-zinc-900">
-                Order Summary
-              </h3>
-              <ul className="mt-2 space-y-1 text-sm text-zinc-600">
-                {items.map(
-                  (item: {
-                    productId: string;
-                    quantity: number;
-                    product?: { name: string; price: number };
-                  }) => (
-                    <li key={item.productId}>
-                      {item.product?.name || "Item"} × {item.quantity}
-                      {item.product?.price != null &&
-                        ` — $${(item.product.price * item.quantity).toFixed(2)}`}
-                    </li>
-                  )
-                )}
-              </ul>
-              <p className="mt-2 font-semibold text-zinc-900">
-                Total: ${total.toFixed(2)}
-              </p>
-            </div>
-          </div>
+                  <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+                      Order ID
+                    </p>
+                    <p className="mt-2 font-mono text-sm text-zinc-900">{order._id}</p>
+                    <p className="mt-2 text-sm text-zinc-600">
+                      Status: <span className="capitalize">{order.status}</span>
+                    </p>
+                  </div>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              href={`/track-order/${order._id}`}
-              className="rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white hover:bg-zinc-800"
-            >
-              Track Order
-            </Link>
-            <Link
-              href="/account/orders"
-              className="rounded-lg border border-zinc-300 px-6 py-3 font-medium text-zinc-700 hover:bg-zinc-100"
-            >
-              View Orders
-            </Link>
-            <Link
-              href="/products"
-              className="rounded-lg border border-zinc-300 px-6 py-3 font-medium text-zinc-700 hover:bg-zinc-100"
-            >
-              Continue Shopping
-            </Link>
+                  <div className="mt-6">
+                    <p className="text-sm font-semibold tracking-wide text-zinc-900">
+                      Items
+                    </p>
+                    <div className="mt-4 space-y-3">
+                      {items.map(
+                        (item: {
+                          productId: string;
+                          quantity: number;
+                          product?: { name: string; price: number };
+                        }) => (
+                          <div
+                            key={item.productId}
+                            className="flex items-start justify-between gap-4 rounded-2xl border border-zinc-200 p-4"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="h-14 w-14 rounded-xl bg-zinc-100" />
+                              <div>
+                                <p className="text-sm font-medium text-zinc-900">
+                                  {item.product?.name || "Item"}
+                                </p>
+                                <p className="mt-1 text-xs text-zinc-500">
+                                  Qty: {item.quantity}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-sm font-medium text-zinc-900">
+                              ₹
+                              {Math.round(
+                                (item.product?.price || 0) * (item.quantity || 0)
+                              )}
+                            </p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="md:col-span-5">
+                <div className="rounded-3xl border border-zinc-200 bg-white p-6">
+                  <h2 className="text-lg font-semibold tracking-wide text-zinc-900">
+                    Order Summary
+                  </h2>
+                  <div className="mt-6 space-y-3 border-t border-zinc-200 pt-6 text-sm">
+                    <div className="flex justify-between text-zinc-700">
+                      <span>Delivery</span>
+                      <span>₹0</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-700">
+                      <span>Tax</span>
+                      <span>₹0</span>
+                    </div>
+                    <div className="flex justify-between pt-2 text-base font-semibold text-zinc-900">
+                      <span>Total</span>
+                      <span>₹{Math.round(total)}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+                    <p className="text-sm font-semibold tracking-wide text-zinc-900">
+                      Delivery Address
+                    </p>
+                    <p className="mt-3 text-sm text-zinc-600">
+                      {address.fullName}
+                      <br />
+                      {address.address}
+                      <br />
+                      {address.city}, {address.state} {address.zip}
+                      <br />
+                      {address.country}
+                    </p>
+                  </div>
+
+                  <div className="mt-6">
+                    <ButtonLink href="/products" variant="outline" className="w-full">
+                      Continue shopping
+                    </ButtonLink>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </Container>
+    </main>
   );
 }

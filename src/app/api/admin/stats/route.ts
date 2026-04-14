@@ -9,6 +9,7 @@ const emptyStats = {
   users: 0,
   revenue: 0,
   pendingOrders: 0,
+  orderStatusBreakdown: [] as { status: string; count: number }[],
 };
 
 export async function GET(request: Request) {
@@ -35,6 +36,18 @@ export async function GET(request: Request) {
       ["pending", "processing", "shipped"].includes(o.status || "")
     ).length;
 
+    const breakdownAgg = await db
+      .collection("orders")
+      .aggregate<{ _id: string | null; count: number }>([
+        { $group: { _id: { $ifNull: ["$status", "unknown"] }, count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ])
+      .toArray();
+    const orderStatusBreakdown = breakdownAgg.map((d) => ({
+      status: d._id == null ? "unknown" : String(d._id),
+      count: d.count,
+    }));
+
     return NextResponse.json({
       products: productsCount,
       categories: categoriesCount,
@@ -42,6 +55,7 @@ export async function GET(request: Request) {
       users: usersCount,
       revenue: totalRevenue,
       pendingOrders,
+      orderStatusBreakdown,
     });
   } catch {
     // Dev admin bypass: return empty stats when DB is unavailable

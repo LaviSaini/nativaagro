@@ -14,6 +14,7 @@ import {
   Line,
 } from "recharts";
 import { adminFetch } from "@/lib/admin-api";
+import { AdminFlash } from "@/components/admin/AdminFlash";
 
 interface DataPoint {
   period: string;
@@ -27,17 +28,30 @@ export default function AdminAnalyticsPage() {
   );
   const [data, setData] = useState<DataPoint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     adminFetch(`/api/admin/analytics?period=${period}`)
-      .then((r) => (r.ok ? r.json() : { data: [] }))
+      .then(async (r) => {
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          throw new Error(j.error || "Failed to load analytics");
+        }
+        return r.json();
+      })
       .then((res) => setData(res.data || []))
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "Failed to load");
+        setData([]);
+      })
       .finally(() => setLoading(false));
   }, [period]);
 
   return (
     <div>
+      {error ? <AdminFlash type="error">{error}</AdminFlash> : null}
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-zinc-900">Sales & Orders</h1>
         <div className="flex gap-2">

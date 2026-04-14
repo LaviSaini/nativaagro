@@ -1,4 +1,5 @@
-import Link from "next/link";
+import Container from "@/components/ui/Container";
+import { ButtonLink } from "@/components/ui/Button";
 
 async function getBlog(id: string) {
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -21,47 +22,55 @@ export default async function BlogDetailPage({
 
   if (!blog) {
     return (
-      <div className="min-h-screen bg-zinc-50 px-4 py-12">
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-2xl font-bold text-zinc-900">Blog not found</h1>
-          <Link
-            href="/blogs"
-            className="mt-4 inline-block text-blue-600 hover:underline"
-          >
-            Back to blog
-          </Link>
-        </div>
-      </div>
+      <main className="bg-white">
+        <Container>
+          <div className="py-20 text-center">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+              Blog not found
+            </h1>
+            <div className="mt-6">
+              <ButtonLink href="/blogs" variant="outline">
+                Back to blogs
+              </ButtonLink>
+            </div>
+          </div>
+        </Container>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <article className="mx-auto max-w-3xl px-4 py-12">
-        <Link
-          href="/blogs"
-          className="mb-6 inline-block text-sm text-zinc-600 hover:text-zinc-900"
-        >
-          ← Back to blog
-        </Link>
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900">{blog.title}</h1>
-          {(blog.author || blog.publishedAt) && (
-            <p className="mt-4 text-sm text-zinc-500">
-              {blog.author && <>By {blog.author}</>}
-              {blog.author && blog.publishedAt && " · "}
-              {blog.publishedAt && (
-                <> {new Date(blog.publishedAt).toLocaleDateString()}</>
-              )}
+    <main className="bg-white">
+      <Container>
+        <article className="mx-auto max-w-3xl py-12">
+          <ButtonLink href="/blogs" variant="ghost" size="sm">
+            Back
+          </ButtonLink>
+
+          <div className="mt-8">
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+              {blog.category || "Beekeeping"}
             </p>
-          )}
-        </header>
-        <div className="prose prose-zinc max-w-none rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
-          <div className="whitespace-pre-wrap text-zinc-700">
-            {blog.content}
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-zinc-900">
+              {blog.title}
+            </h1>
+            {(blog.author || blog.publishedAt) && (
+              <p className="mt-4 text-sm text-zinc-500">
+                {blog.author ? `By ${blog.author}` : ""}
+                {blog.author && blog.publishedAt ? " · " : ""}
+                {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : ""}
+              </p>
+            )}
           </div>
-        </div>
-      </article>
-    </div>
+
+          <div className="mt-10 rounded-3xl border border-zinc-200 bg-white p-8">
+            <div className="aspect-[16/9] w-full rounded-2xl bg-zinc-100" />
+            <div className="mt-8 whitespace-pre-wrap text-sm leading-7 text-zinc-700">
+              {blog.content}
+            </div>
+          </div>
+        </article>
+      </Container>
+    </main>
   );
 }

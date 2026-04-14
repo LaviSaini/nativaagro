@@ -1,206 +1,234 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { clearAuthToken, getAuthUser, type AuthUser } from "@/lib/auth";
+import { ButtonLink } from "@/components/ui/Button";
 
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-  icon?: string;
+const navLinks: Array<{ href: string; label: string }> = [
+  { href: "/", label: "Home" },
+  { href: "/products", label: "Products" },
+  { href: "/about", label: "Our Story" },
+  { href: "/blogs", label: "Blog" },
+];
+
+function LeafIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M12 3C8 6 5 10 5 14c0 3.5 2.5 6 6 6 1.5 0 3-.4 4.2-1.2C19 16.5 20 12 19 8c-1-3-4-5-7-5z"
+        fill="#4E5F57"
+      />
+      <path
+        d="M12 8c2 1.5 3.5 4 3.8 6.5"
+        stroke="#697563"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [search, setSearch] = useState("");
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const moreRef = useRef<HTMLDivElement>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileRef = useRef<HTMLDivElement>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
-    fetch("/api/categories")
-      .then((r) => (r.ok ? r.json() : []))
-      .then(setCategories)
-      .catch(() => setCategories([]));
-  }, []);
-
-  const currentCategory = searchParams?.get("category") || "";
-  const isProductsPage = pathname === "/products";
+    setMobileOpen(false);
+    setUser(getAuthUser());
+  }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-        setMoreOpen(false);
+      if (mobileRef.current && !mobileRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const q = search.trim();
-    if (q) {
-      router.push(`/search?q=${encodeURIComponent(q)}`);
-    } else {
-      router.push("/search");
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key === "ecomapp_token" || e.key === "ecomapp_user") {
+        setUser(getAuthUser());
+      }
     }
-  }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
-  const isHome = pathname === "/";
-
-  function isCategoryActive(cat: { slug: string }) {
-    if (isHome && !cat.slug) return true;
-    if (isProductsPage && currentCategory === cat.slug) return true;
-    return false;
+  function logout() {
+    clearAuthToken();
+    setUser(null);
+    router.push("/");
+    router.refresh();
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white shadow-sm">
-      {/* Top row: Search + Actions */}
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
-        <Link href="/" className="shrink-0 text-xl font-bold text-blue-600">
-          EcomApp
+    <header className="sticky top-0 z-50 border-b border-[color:var(--accent)]/25 bg-[color:var(--surface)]/95 backdrop-blur-md">
+      <div className="relative mx-auto flex h-[72px] max-w-[1240px] items-center px-4 sm:px-5">
+        <Link href="/" className="flex shrink-0 items-center gap-2 text-[color:var(--ink)]">
+          <LeafIcon />
+          <span className="text-xl font-semibold tracking-tight md:text-2xl">Native</span>
         </Link>
 
-        <form
-          onSubmit={handleSearch}
-          className="flex flex-1 max-w-xl"
+        <nav
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-10 md:flex"
+          aria-label="Main"
         >
-          <div className="relative flex w-full items-center rounded-lg border border-zinc-300 bg-zinc-50 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
-            <svg
-              className="ml-3 h-5 w-5 text-zinc-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search for Products, Brands and More"
-              className="w-full border-0 bg-transparent py-2.5 pl-2 pr-4 text-zinc-900 placeholder-zinc-500 focus:outline-none focus:ring-0"
-            />
-          </div>
-        </form>
-
-        <div className="flex shrink-0 items-center gap-6">
-          <Link
-            href="/auth/login"
-            className="flex items-center gap-1 text-sm font-medium text-zinc-700 hover:text-blue-600"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Login
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </Link>
-          <Link
-            href="/auth/register"
-            className="text-sm font-medium text-zinc-700 hover:text-blue-600"
-          >
-            Sign up
-          </Link>
-
-          <div className="relative" ref={moreRef}>
-            <button
-              type="button"
-              onClick={() => setMoreOpen(!moreOpen)}
-              className="flex items-center gap-1 text-sm font-medium text-zinc-700 hover:text-blue-600"
-            >
-              More
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {moreOpen && (
-              <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border border-zinc-200 bg-white py-2 shadow-lg">
-                <Link
-                  href="/track-order"
-                  className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
-                  onClick={() => setMoreOpen(false)}
-                >
-                  Track Order
-                </Link>
-                <Link
-                  href="/account/orders/in-transit"
-                  className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
-                  onClick={() => setMoreOpen(false)}
-                >
-                  Orders in Transit
-                </Link>
-                <Link
-                  href="/account"
-                  className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
-                  onClick={() => setMoreOpen(false)}
-                >
-                  Account
-                </Link>
-                <Link
-                  href="/blogs"
-                  className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
-                  onClick={() => setMoreOpen(false)}
-                >
-                  Blog
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <Link
-            href="/cart"
-            className="flex items-center gap-1 text-sm font-medium text-zinc-700 hover:text-blue-600"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            Cart
-          </Link>
-        </div>
-      </div>
-
-      {/* Category row */}
-      <div className="border-t border-zinc-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-2">
-          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
-            <Link
-              href="/products"
-              className={`flex shrink-0 flex-col items-center gap-1 rounded-lg px-4 py-2 transition ${
-                isCategoryActive({ slug: "" })
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
-              }`}
-            >
-              <span className="text-2xl">🎁</span>
-              <span className="text-xs font-medium whitespace-nowrap">All</span>
-            </Link>
-            {categories.map((cat) => (
+          {navLinks.map((l) => {
+            const active = pathname === l.href || (l.href !== "/" && pathname?.startsWith(l.href));
+            return (
               <Link
-                key={cat._id}
-                href={`/products?category=${cat.slug}`}
-                className={`flex shrink-0 flex-col items-center gap-1 rounded-lg px-4 py-2 transition ${
-                  isCategoryActive(cat)
-                    ? "bg-blue-50 text-blue-600"
-                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                key={l.href}
+                href={l.href}
+                className={`text-[15px] font-medium transition ${
+                  active ? "text-[color:var(--ink)]" : "text-[#201914]/80 hover:text-[color:var(--ink)]"
                 }`}
               >
-                <span className="text-2xl">{cat.icon || "📦"}</span>
-                <span className="text-xs font-medium whitespace-nowrap">{cat.name}</span>
+                {l.label}
               </Link>
-            ))}
-          </div>
+            );
+          })}
+        </nav>
+
+        <div className="ml-auto hidden items-center gap-5 md:flex">
+          <Link
+            href="/search"
+            className="grid h-10 w-10 place-items-center rounded-full text-[color:var(--ink)] transition hover:bg-white/70"
+            aria-label="Search"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+              <path d="M20 20l-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </Link>
+          <Link
+            href={user ? "/account" : "/auth/login"}
+            className="grid h-10 w-10 place-items-center rounded-full text-[color:var(--ink)] transition hover:bg-white/70"
+            aria-label={user ? "My account" : "Sign in"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="12" cy="9" r="4" stroke="currentColor" strokeWidth="2" />
+              <path
+                d="M6 20c0-4 3.5-6 6-6s6 2 6 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </Link>
+          <Link
+            href="/cart"
+            className="grid h-10 w-10 place-items-center rounded-full text-[color:var(--ink)] transition hover:bg-white/70"
+            aria-label="Cart"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M6 6h15l-1.5 9H7.5L6 6zm0 0L5 3H2"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="9" cy="20" r="1.5" fill="currentColor" />
+              <circle cx="18" cy="20" r="1.5" fill="currentColor" />
+            </svg>
+          </Link>
+          {user ? (
+            <button
+              type="button"
+              onClick={logout}
+              className="text-sm font-medium text-[color:var(--text)] hover:text-[color:var(--ink)]"
+            >
+              Log out
+            </button>
+          ) : null}
+          <ButtonLink href="/products" className="px-7 py-2.5 text-[15px]">
+            Buy Now
+          </ButtonLink>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2 md:hidden" ref={mobileRef}>
+          <ButtonLink href="/products" className="px-4 py-2 text-sm">
+            Buy Now
+          </ButtonLink>
+          <button
+            type="button"
+            onClick={() => setMobileOpen((s) => !s)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--ink)]/15 bg-white text-[color:var(--ink)]"
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M4 7h16M4 12h16M4 17h16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+          {mobileOpen ? (
+            <div className="absolute right-4 top-full z-50 mt-2 w-64 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl">
+              <div className="flex flex-col gap-1">
+                {navLinks.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/search"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                >
+                  Search
+                </Link>
+                <Link
+                  href="/cart"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                >
+                  Cart
+                </Link>
+                <Link
+                  href={user ? "/account" : "/auth/login"}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                >
+                  {user ? "My account" : "Sign in"}
+                </Link>
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                  >
+                    Log out
+                  </button>
+                ) : null}
+                <Link
+                  href="/contact"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                >
+                  Contact
+                </Link>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </header>

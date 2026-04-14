@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
@@ -30,10 +31,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Hash password with bcrypt
+    const passwordHash = await bcrypt.hash(password, 10);
     const result = await db.collection("users").insertOne({
       email,
-      password, // TODO: hash before storing
+      passwordHash,
       name,
       role: "user",
       createdAt: new Date(),
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
         name: user?.name,
         role: user?.role || "user",
       },
-      token: "placeholder-token", // TODO: JWT
+      token: `user:${user?._id?.toString()}`, // lightweight token for demo
     });
   } catch {
     return NextResponse.json(

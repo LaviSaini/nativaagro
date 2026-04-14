@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   try {
     const db = await connectToDatabase();
     const body = await request.json();
-    const { name, slug, description, icon } = body;
+    const { name, slug, description, icon, image } = body;
 
     if (!name || !slug) {
       return NextResponse.json(
@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       slug,
       description: description || "",
       icon: icon || "",
+      image: typeof image === "string" ? image : "",
       createdAt: new Date(),
       updatedAt: new Date(),
     });

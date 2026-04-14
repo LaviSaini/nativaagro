@@ -1,4 +1,17 @@
-import Link from "next/link";
+import Container from "@/components/ui/Container";
+import ProductCard from "@/components/products/ProductCard";
+import { ProductsToolbar } from "./toolbar";
+
+async function getCategories() {
+  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  try {
+    const res = await fetch(`${base}/api/categories`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
 
 async function getProducts(search?: string, category?: string) {
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -7,7 +20,9 @@ async function getProducts(search?: string, category?: string) {
   if (category) params.set("category", category);
   const qs = params.toString();
   try {
-    const res = await fetch(`${base}/api/products${qs ? `?${qs}` : ""}`, { cache: "no-store" });
+    const res = await fetch(`${base}/api/products${qs ? `?${qs}` : ""}`, {
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     return res.json();
   } catch {
@@ -18,42 +33,49 @@ async function getProducts(search?: string, category?: string) {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string }>;
+  searchParams: Promise<{ search?: string; category?: string; sort?: string }>;
 }) {
-  const { search, category } = await searchParams;
-  const products = await getProducts(search, category);
+  const { search, category, sort } = await searchParams;
+  const [products, categories] = await Promise.all([
+    getProducts(search, category),
+    getCategories(),
+  ]);
+
+  const sorted = [...products];
+  if (sort === "price_asc") sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+  if (sort === "price_desc") sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-6xl px-4 py-12">
-        <h1 className="mb-8 text-3xl font-bold text-zinc-900">
-          {search ? `Search: "${search}"` : category ? `Category: ${category}` : "Products"}
-        </h1>
-        {products.length === 0 ? (
-          <p className="rounded-lg bg-amber-50 p-4 text-amber-800">
-            No products yet. Add MONGODB_URI to .env.local and seed your
-            database to see products here.
+    <main className="bg-white">
+      <Container>
+        <div className="py-12">
+          <p className="text-sm uppercase tracking-[0.35em] text-zinc-500">
+            Get To Know
           </p>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product: { _id: string; name: string; price: number; description?: string }) => (
-              <Link
-                key={product._id}
-                href={`/products/${product._id}`}
-                className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:shadow-md"
-              >
-                <h2 className="font-semibold text-zinc-900">{product.name}</h2>
-                <p className="mt-1 text-sm text-zinc-600 line-clamp-2">
-                  {product.description}
-                </p>
-                <p className="mt-4 font-medium text-zinc-900">
-                  ${product.price?.toFixed(2)}
-                </p>
-              </Link>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-zinc-900">
+            The Range
+          </h1>
+
+          <ProductsToolbar
+            categories={categories}
+            activeCategory={category || ""}
+            search={search || ""}
+            sort={sort || ""}
+          />
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {sorted.map((product: { _id: string; name: string; price: number; description?: string }) => (
+              <ProductCard key={product._id} product={product} showQuickView />
             ))}
           </div>
-        )}
-      </div>
-    </div>
+
+          {sorted.length === 0 ? (
+            <div className="mt-10 rounded-3xl border border-zinc-200 bg-zinc-50 p-10 text-sm text-zinc-600">
+              No products found.
+            </div>
+          ) : null}
+        </div>
+      </Container>
+    </main>
   );
 }

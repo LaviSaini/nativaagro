@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb64c" stop-opacity="0.28"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#4e5f57" stop-opacity="0.22"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" rx="36" fill="#fff9ea"/>
+  <rect x="18" y="18" width="1564" height="864" rx="30" fill="url(#bg)"/>
+  <g fill="#1b1b1b" opacity="0.85">
+    <text x="64" y="120" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">TRANSPARENCY BANNER</text>
+    <text x="64" y="176" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" opacity="0.75">Replace with real image/video thumbnail</text>
+  </g>
+  <circle cx="800" cy="470" r="86" fill="#ffffff" opacity="0.35"/>
+  <circle cx="800" cy="470" r="66" fill="#ffffff" opacity="0.55"/>
+  <path d="M788 438l62 32-62 32z" fill="#ffffff" opacity="0.9"/>
+</svg>

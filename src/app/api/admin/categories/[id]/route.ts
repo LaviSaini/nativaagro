@@ -20,13 +20,14 @@ export async function PUT(
 
     const db = await connectToDatabase();
     const body = await request.json();
-    const { name, slug, description, icon } = body;
+    const { name, slug, description, icon, image } = body;
 
     const update: Record<string, unknown> = { updatedAt: new Date() };
     if (name !== undefined) update.name = name;
     if (slug !== undefined) update.slug = slug;
     if (description !== undefined) update.description = description;
     if (icon !== undefined) update.icon = icon;
+    if (image !== undefined) update.image = image;
 
     const result = await db.collection("categories").updateOne(
       { _id: new ObjectId(id) },

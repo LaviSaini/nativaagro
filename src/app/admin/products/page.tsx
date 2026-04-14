@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { adminFetch } from "@/lib/admin-api";
+import { AdminFlash } from "@/components/admin/AdminFlash";
 
 interface Product {
   _id: string;
@@ -15,11 +16,20 @@ interface Product {
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setError(null);
     adminFetch("/api/admin/products")
-      .then((r) => (r.ok ? r.json() : []))
+      .then(async (r) => {
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          throw new Error(j.error || "Failed to load products");
+        }
+        return r.json();
+      })
       .then(setProducts)
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -35,6 +45,7 @@ export default function AdminProductsPage() {
 
   return (
     <div>
+      {error ? <AdminFlash type="error">{error}</AdminFlash> : null}
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-zinc-900">Products</h1>
         <Link

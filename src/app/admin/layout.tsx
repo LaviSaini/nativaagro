@@ -25,6 +25,10 @@ export default function AdminLayout({
               <AdminNav href="/admin/products">Products</AdminNav>
               <AdminNav href="/admin/categories">Categories</AdminNav>
               <AdminNav href="/admin/orders">Orders</AdminNav>
+              <AdminNav href="/admin/users">Users</AdminNav>
+              <AdminNav href="/admin/blogs">Blogs</AdminNav>
+              <AdminNav href="/admin/reviews">Reviews</AdminNav>
+              <AdminNav href="/admin/settings">Settings</AdminNav>
             </nav>
             <Link
               href="/"

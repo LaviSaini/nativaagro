@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fafaf9"/>
+      <stop offset="1" stop-color="#e7e5e4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" rx="64" fill="url(#g)"/>
+  <g>
+    <text x="90" y="160" font-family="Arial, Helvetica, sans-serif" font-size="54" fill="#18181b" opacity="0.9">Nativa Agro</text>
+    <text x="90" y="235" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#3f3f46">Raw Honey 500g</text>
+    <text x="90" y="290" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#71717a">Placeholder image (replace with real product photo)</text>
+  </g>
+  <g transform="translate(820,250)">
+    <rect x="0" y="0" width="280" height="360" rx="48" fill="#ffffff" opacity="0.7"/>
+    <rect x="50" y="60" width="180" height="260" rx="46" fill="#f59e0b" opacity="0.22"/>
+    <rect x="78" y="88" width="124" height="204" rx="36" fill="#f59e0b" opacity="0.32"/>
+  </g>
+</svg>
+

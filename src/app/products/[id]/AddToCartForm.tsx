@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getSessionId } from "@/lib/checkout";
+import { Button } from "@/components/ui/Button";
 
 export default function AddToCartForm({ productId }: { productId: string }) {
   const router = useRouter();
@@ -28,14 +29,10 @@ export default function AddToCartForm({ productId }: { productId: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8">
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-      >
-        {loading ? "Adding..." : "Add to Cart"}
-      </button>
+    <form onSubmit={handleSubmit} className="mt-6">
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? "Adding..." : "Add to cart"}
+      </Button>
     </form>
   );
 }

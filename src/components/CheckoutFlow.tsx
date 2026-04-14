@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   setShippingAddress,
   getShippingAddress,
   getSessionId,
   type ShippingAddress,
 } from "@/lib/checkout";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 const INITIAL_ADDRESS: ShippingAddress = {
   fullName: "",
@@ -52,13 +52,13 @@ export default function CheckoutFlow() {
     e.preventDefault();
     setSubmitting(true);
     setShippingAddress(address);
-    router.push("/checkout/payment");
+    router.push("/checkout/shipping");
     setSubmitting(false);
   }
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-8">
+      <div className="rounded-3xl border border-zinc-200 bg-white p-8">
         <p className="text-zinc-600">Loading...</p>
       </div>
     );
@@ -69,17 +69,14 @@ export default function CheckoutFlow() {
 
   if (isEmpty) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
+      <div className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm">
         <h2 className="text-xl font-semibold text-zinc-900">Your cart is empty</h2>
-        <p className="mt-2 text-zinc-600">
-          Add items to your cart before checkout.
-        </p>
-        <Link
-          href="/products"
-          className="mt-6 inline-block rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white hover:bg-zinc-800"
-        >
-          Browse Products
-        </Link>
+        <p className="mt-2 text-zinc-600">Add items to your cart before checkout.</p>
+        <div className="mt-6">
+          <ButtonLink href="/products" variant="outline">
+            Browse Products
+          </ButtonLink>
+        </div>
       </div>
     );
   }
@@ -91,13 +88,19 @@ export default function CheckoutFlow() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h2 className="mb-6 text-lg font-semibold text-zinc-900">
-          Shipping Address
+      <div className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm">
+        <StepHeader activeStep={1} />
+
+        <h2 className="mt-8 text-lg font-semibold tracking-wide text-zinc-900">
+          Select Address
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <p className="mt-2 text-sm text-zinc-600">
+          Use your default address or add a new one.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700">
+            <label className="text-xs font-medium tracking-wide text-zinc-700">
               Full Name
             </label>
             <input
@@ -107,11 +110,11 @@ export default function CheckoutFlow() {
               onChange={(e) =>
                 setAddress((a) => ({ ...a, fullName: e.target.value }))
               }
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+              className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-700">
+            <label className="text-xs font-medium tracking-wide text-zinc-700">
               Address
             </label>
             <input
@@ -121,12 +124,12 @@ export default function CheckoutFlow() {
               onChange={(e) =>
                 setAddress((a) => ({ ...a, address: e.target.value }))
               }
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+              className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
             />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-zinc-700">
+              <label className="text-xs font-medium tracking-wide text-zinc-700">
                 City
               </label>
               <input
@@ -136,11 +139,11 @@ export default function CheckoutFlow() {
                 onChange={(e) =>
                   setAddress((a) => ({ ...a, city: e.target.value }))
                 }
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+                className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700">
+              <label className="text-xs font-medium tracking-wide text-zinc-700">
                 State / Province
               </label>
               <input
@@ -150,13 +153,13 @@ export default function CheckoutFlow() {
                 onChange={(e) =>
                   setAddress((a) => ({ ...a, state: e.target.value }))
                 }
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+                className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
               />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-zinc-700">
+              <label className="text-xs font-medium tracking-wide text-zinc-700">
                 ZIP / Postal Code
               </label>
               <input
@@ -166,11 +169,11 @@ export default function CheckoutFlow() {
                 onChange={(e) =>
                   setAddress((a) => ({ ...a, zip: e.target.value }))
                 }
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+                className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700">
+              <label className="text-xs font-medium tracking-wide text-zinc-700">
                 Country
               </label>
               <input
@@ -180,23 +183,22 @@ export default function CheckoutFlow() {
                 onChange={(e) =>
                   setAddress((a) => ({ ...a, country: e.target.value }))
                 }
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
+                className="mt-2 w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-zinc-900/20"
               />
             </div>
           </div>
-          <div className="flex justify-end pt-4">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-            >
-              Continue to Payment
-            </button>
+          <div className="flex items-center justify-between pt-4">
+            <ButtonLink href="/cart" variant="ghost">
+              Back
+            </ButtonLink>
+            <Button type="submit" disabled={submitting}>
+              Next
+            </Button>
           </div>
         </form>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold text-zinc-900">
           Order Summary
         </h2>
@@ -221,17 +223,32 @@ export default function CheckoutFlow() {
         <div className="mt-4 border-t border-zinc-200 pt-4">
           <div className="flex justify-between font-semibold text-zinc-900">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>₹{Math.round(subtotal)}</span>
           </div>
         </div>
       </div>
 
-      <Link
-        href="/cart"
-        className="inline-block text-sm text-blue-600 hover:underline"
-      >
-        ← Back to cart
-      </Link>
+    </div>
+  );
+}
+
+function StepHeader({ activeStep }: { activeStep: 1 | 2 | 3 }) {
+  return (
+    <div className="flex items-center gap-3 text-sm">
+      <span className={`font-medium ${activeStep === 1 ? "text-zinc-900" : "text-zinc-500"}`}>
+        Step 1
+      </span>
+      <span className="text-zinc-400">Address</span>
+      <span className="text-zinc-300">•</span>
+      <span className={`font-medium ${activeStep === 2 ? "text-zinc-900" : "text-zinc-500"}`}>
+        Step 2
+      </span>
+      <span className="text-zinc-400">Shipping</span>
+      <span className="text-zinc-300">•</span>
+      <span className={`font-medium ${activeStep === 3 ? "text-zinc-900" : "text-zinc-500"}`}>
+        Step 3
+      </span>
+      <span className="text-zinc-400">Payment</span>
     </div>
   );
 }

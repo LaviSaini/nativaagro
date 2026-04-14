@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { adminFetch } from "@/lib/admin-api";
+import { AdminImageField } from "@/components/admin/AdminImageField";
 
 interface Category {
   _id: string;
@@ -149,17 +150,13 @@ export default function NewProductPage() {
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-zinc-700">
-            Image URL
-          </label>
-          <input
-            type="url"
-            value={form.image}
-            onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
-          />
-        </div>
+        <AdminImageField
+          label="Product image"
+          folder="products"
+          value={form.image}
+          onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+          helpText="JPEG, PNG, WebP, GIF, or SVG — saved under public/products."
+        />
         <div className="flex gap-4">
           <button
             type="submit"
