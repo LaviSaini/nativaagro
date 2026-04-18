@@ -21,11 +21,15 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
   const safeSlides = useMemo(() => (slides?.length ? slides : fallbackSlides), [slides]);
   const [i, setI] = useState(0);
   const slide = safeSlides[i] ?? safeSlides[0];
+  const [animKey, setAnimKey] = useState(0);
 
   function prev() {
+    setAnimKey((k) => k + 1);
     setI((p) => (p - 1 + safeSlides.length) % safeSlides.length);
   }
+
   function next() {
+    setAnimKey((k) => k + 1);
     setI((p) => (p + 1) % safeSlides.length);
   }
 
@@ -96,9 +100,12 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
                 <div className="absolute inset-0 rounded-[50px] border border-dashed border-[#C5BBA4] w-[300px] h-[440px] mx-auto top-1/2 -translate-y-1/2" />
 
                 {/* Bottle Image */}
-                <div className="relative h-[520px] w-[340px] z-10 drop-shadow-2xl">
+                <div
+                  key={animKey}
+                  className="relative h-[520px] w-[340px] z-10 drop-shadow-2xl animate-fade-scale"
+                >
                   <Image
-                    src={bottleImage}
+                    src={slide.image || bottleImage}
                     alt={slide.title}
                     fill
                     className="object-contain"
@@ -172,6 +179,22 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
           </div>
         </section>
       </Container>
+      <style jsx>{`
+  .animate-fade-scale {
+    animation: fadeScale 1s ease;
+  }
+
+  @keyframes fadeScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+`}</style>
     </div>
   );
 }
@@ -232,3 +255,4 @@ const fallbackSlides: HeroSlide[] = [
     ],
   },
 ];
+
