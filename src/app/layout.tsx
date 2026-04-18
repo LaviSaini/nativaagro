@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EcomApp",
-  description: "E-commerce application built with Next.js",
+  title: "Nativa Agro",
+  description: "Nativa Agro is a family-owned business dedicated to providing high-quality, natural honey products sourced directly from local beekeepers. Our mission is to promote sustainable beekeeping practices and support the health of our pollinators while delivering pure, delicious honey to our customers.",
 };
 
 export default function RootLayout({

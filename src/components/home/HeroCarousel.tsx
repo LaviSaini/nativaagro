@@ -1,22 +1,24 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ButtonLink } from "@/components/ui/Button";
+import Container from "../ui/Container";
+
+import beeImage from "../../../public/home/bee.png";
+import bottleImage from "../../../public/home/HoneyBottle.png";
 
 export type HeroSlide = {
   eyebrow: string;
   title: string;
   tagline: string;
-  image: string;
+  image: string | any;
   specs: Array<{ line1: string; line2?: string }>;
-  /** Label shown between carousel arrows */
   carouselLabel: string;
+  ingredients?: string[];
 };
 
-export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
-  const safeSlides = useMemo(() => (slides?.length ? slides : [fallbackSlide]), [slides]);
+export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
+  const safeSlides = useMemo(() => (slides?.length ? slides : fallbackSlides), [slides]);
   const [i, setI] = useState(0);
   const slide = safeSlides[i] ?? safeSlides[0];
 
@@ -28,116 +30,205 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   }
 
   return (
-    <section className="relative overflow-hidden bg-transparent pb-6 pt-8 md:pb-10 md:pt-12">
-      {/* Decorative dashed arc (top-left, like PDF) */}
-      <div
-        className="pointer-events-none absolute -left-24 -top-16 hidden h-[420px] w-[420px] rounded-full border border-dashed border-[color:var(--accent)] opacity-70 md:block"
-        aria-hidden
-      />
+    <div className="relative border-b border-[#EAE3D5] overflow-hidden bg-[#FDF7EA]">
+      {/* Background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#FFF1DB] via-[#FDF7E9] to-[#FAF4E4] pointer-events-none" />
 
-      <div className="relative z-10 grid items-center gap-10 lg:grid-cols-12 lg:gap-6">
-        {/* Left: copy + CTA */}
-        <div className="lg:col-span-3">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[color:var(--text)]">
-            {slide.eyebrow}
-          </p>
-          <h1 className="mt-2 text-4xl font-semibold leading-tight tracking-tight text-[color:var(--ink)] md:text-5xl lg:text-[56px] lg:leading-[1.05]">
-            {slide.title}
-          </h1>
-          <p className="mt-4 max-w-sm text-base leading-relaxed text-[color:var(--text)] md:text-lg">
-            {slide.tagline}
-          </p>
-          <div className="mt-8">
-            <ButtonLink href="/products" className="min-w-[140px] px-8 py-3 text-base">
-              Shop Now
-            </ButtonLink>
-          </div>
-        </div>
+      {/* decorative dashed circle (top right) */}
+      <div className="pointer-events-none absolute right-[-200px] top-[-460px] hidden h-[650px] w-[650px] rounded-full border border-dashed border-[#FFB64C] md:block" />
 
-        {/* Center: hero product */}
-        <div className="relative flex min-h-[320px] items-center justify-center lg:col-span-6 lg:min-h-[480px]">
-          <div
-            className="pointer-events-none absolute inset-[8%] rounded-full border border-dashed border-[color:var(--accent)]/80"
-            aria-hidden
-          />
-          <div className="relative z-10 aspect-square w-[min(100%,420px)] md:w-[min(100%,520px)]">
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill
-              className="object-contain drop-shadow-xl"
-              sizes="(max-width: 1024px) 90vw, 520px"
-              priority
-            />
-          </div>
-        </div>
+      {/* bee (top right) */}
+      <div className="pointer-events-none absolute right-[5%] top-0 hidden md:block w-34 h-34 opacity-100">
+        <Image src={beeImage} alt="Bee" fill className="object-contain rotate-[160deg]" />
+      </div>
 
-        {/* Right: specs */}
-        <div className="flex flex-col justify-center gap-8 lg:col-span-3">
-          {slide.specs.map((s) => (
-            <div key={s.line1} className="flex items-start gap-4 border-b border-dashed border-[color:var(--ink)]/15 pb-6 last:border-0 last:pb-0">
-              <span
-                className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[color:var(--brand)]/10 text-lg text-[color:var(--brand)]"
-                aria-hidden
-              >
-                ✦
-              </span>
-              <div>
-                <p className="text-lg font-semibold text-[color:var(--ink)]">{s.line1}</p>
-                {s.line2 ? (
-                  <p className="mt-0.5 text-sm text-[color:var(--text)]">{s.line2}</p>
-                ) : null}
+      {/* bee (bottom left) */}
+      <div className="pointer-events-none absolute bottom-15 left-[5%] hidden md:block w-28 h-28 opacity-100">
+        <Image src={beeImage} alt="Bee" fill className="object-contain scale-x-[-1] rotate-[130deg]" />
+      </div>
+
+      <Container>
+        <section className="relative z-10 py-16 md:py-24 min-h-[750px] flex items-center">
+          <div className="mx-auto grid w-full items-center gap-12 lg:grid-cols-12">
+
+            {/* LEFT */}
+            <div className="lg:col-span-4 flex flex-col items-center lg:items-end text-center lg:text-right">
+              <div className="flex flex-col justify-content-start text-left">
+                <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-[#555]">
+                  DISCOVER OUR PRODUCTS
+                </p>
+
+                <h1 className="mt-3 text-[56px] font-bold leading-[1.05] text-[#1B1B1B] md:text-[68px] tracking-tight">
+                  {slide.title}
+                </h1>
+
+                <p className="mt-3 text-[14px] text-[#666] tracking-widest uppercase font-medium">
+                  100% PURE RAW HONEY
+                </p>
+              </div>
+              <div className="mt-16 text-[15px] text-[#555] leading-[1.8] font-medium">
+                <p className="mb-2 font-bold text-[#1B1B1B] text-[13px] tracking-[0.1em] uppercase">
+                  INGREDIENTS
+                </p>
+
+                {(slide.ingredients ?? [
+                  "No Added Sugar",
+                  "No Preservatives",
+                  "No Artificial Flavors",
+                ]).map((item, idx, arr) => (
+                  <p key={item}>
+                    {item}
+                    {idx !== arr.length - 1 && ","}
+                  </p>
+                ))}
+              </div>
+
+              <button className="mt-12 w-[240px] cursor-pointer rounded-md bg-[#5E7163] py-4 text-[14px] font-bold uppercase tracking-[0.15em] text-white hover:bg-[#4D5E52] transition-colors shadow-lg">
+                BUY NOW
+              </button>
+            </div>
+
+            {/* CENTER */}
+            <div className="relative flex flex-col items-center justify-center lg:col-span-4 mt-16 lg:mt-0">
+
+              <div className="relative flex items-center justify-center w-full max-w-[340px] aspect-[3/4]">
+                {/* dashed container */}
+                <div className="absolute inset-0 rounded-[50px] border border-dashed border-[#C5BBA4] w-[300px] h-[440px] mx-auto top-1/2 -translate-y-1/2" />
+
+                {/* Bottle Image */}
+                <div className="relative h-[520px] w-[340px] z-10 drop-shadow-2xl">
+                  <Image
+                    src={bottleImage}
+                    alt={slide.title}
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              </div>
+
+              {/* BOTTOM CONTROLS */}
+              <div className="mt-12 flex items-center justify-center gap-8">
+                <button
+                  onClick={prev}
+                  className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-[#C5BBA4] text-[#666] hover:bg-white hover:text-[#111] transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+
+                <div className="text-center min-w-[120px]">
+                  <p className="text-[12px] font-bold text-[#888] tracking-widest mb-1.5">{i + 1} / {safeSlides.length}</p>
+                  <p className="text-[16px] font-bold text-[#222]">
+                    {slide.carouselLabel}
+                  </p>
+                </div>
+
+                <button
+                  onClick={next}
+                  className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-[#C5BBA4] text-[#666] hover:bg-white hover:text-[#111] transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" /></svg>
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Carousel controls — bottom center */}
-      <div className="relative z-10 mx-auto mt-8 flex max-w-xl items-center justify-center gap-6 md:mt-10">
-        <button
-          type="button"
-          onClick={prev}
-          className="grid h-12 w-12 place-items-center rounded-full border border-[color:var(--ink)] bg-white text-[color:var(--ink)] shadow-sm transition hover:bg-[color:var(--surface)]"
-          aria-label="Previous slide"
-        >
-          <span className="text-lg leading-none">‹</span>
-        </button>
-        <p className="min-w-[120px] text-center text-lg font-semibold capitalize text-[color:var(--ink)]">
-          {slide.carouselLabel}
-        </p>
-        <button
-          type="button"
-          onClick={next}
-          className="grid h-12 w-12 place-items-center rounded-full border border-[color:var(--ink)] bg-white text-[color:var(--ink)] shadow-sm transition hover:bg-[color:var(--surface)]"
-          aria-label="Next slide"
-        >
-          <span className="text-lg leading-none">›</span>
-        </button>
-      </div>
+            {/* RIGHT */}
+            <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left mt-16 lg:mt-0">
+              <p className="text-[16px] font-medium leading-[1.7] text-[#444] max-w-[320px]">
+                {slide.tagline}
+              </p>
 
-      <div className="mt-4 text-center">
-        <Link
-          href="/products"
-          className="text-xs font-medium uppercase tracking-[0.25em] text-[color:var(--text)] underline-offset-4 hover:text-[color:var(--ink)] hover:underline"
-        >
-          View all products
-        </Link>
-      </div>
-    </section>
+              <div className="mt-12 flex flex-col w-full max-w-[340px]">
+                <div className="w-full h-px border-t-[1.5px] border-dotted border-[#C5BBA4]" />
+
+                <div className="flex">
+                  <div className="flex-1 py-5 pr-5 border-r-[1.5px] border-dotted border-[#C5BBA4]">
+                    <p className="text-[13px] font-medium text-[#777] mb-1.5">{slide.specs[0]?.line1}</p>
+                    <p className="font-bold text-[#1B1B1B] text-[16px]">{slide.specs[0]?.line2}</p>
+                  </div>
+                  <div className="flex-1 py-5 pl-5">
+                    <p className="text-[13px] font-medium text-[#777] mb-1.5">{slide.specs[1]?.line1}</p>
+                    <p className="font-bold text-[#1B1B1B] text-[16px]">{slide.specs[1]?.line2}</p>
+                  </div>
+                </div>
+
+                <div className="w-full h-px border-t-[1.5px] border-dotted border-[#C5BBA4]" />
+
+                <div className="flex">
+                  <div className="flex-1 py-5 pr-5 border-r-[1.5px] border-dotted border-[#C5BBA4]">
+                    <p className="text-[13px] font-medium text-[#777] mb-1.5">{slide.specs[2]?.line1}</p>
+                    <p className="font-bold text-[#1B1B1B] text-[16px]">{slide.specs[2]?.line2}</p>
+                  </div>
+                  <div className="flex-1 py-5 pl-5">
+                    <p className="text-[13px] font-medium text-[#777] mb-1.5">{slide.specs[3]?.line1}</p>
+                    <p className="font-bold text-[#1B1B1B] text-[16px]">{slide.specs[3]?.line2}</p>
+                  </div>
+                </div>
+
+                <div className="w-full h-px border-t-[1.5px] border-dotted border-[#C5BBA4]" />
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </Container>
+    </div>
   );
 }
 
-const fallbackSlide: HeroSlide = {
-  eyebrow: "Pure and Organic",
-  title: "Raw Honey",
-  tagline: "Get the best of nature — unprocessed, golden, and full of character.",
-  image: "/products/raw-honey-250g.svg",
-  carouselLabel: "Raw Honey",
-  specs: [
-    { line1: "Pure Honey", line2: "Single-origin harvest" },
-    { line1: "Raw Honey", line2: "Never heated or ultra-filtered" },
-    { line1: "500g", line2: "Net weight" },
-    { line1: "100% Organic", line2: "From hive to jar" },
-  ],
-};
+const fallbackSlides: HeroSlide[] = [
+  {
+    eyebrow: "Pure and Organic",
+    title: "Raw Honey",
+    tagline: "Get the best of nature — unprocessed, golden, and full of character.",
+    image: bottleImage,
+    carouselLabel: "Raw Honey",
+    specs: [
+      { line1: "Source", line2: "Wild Forest" },
+      { line1: "Purity", line2: "100% Natural" },
+      { line1: "Processing", line2: "Unprocessed" },
+      { line1: "Taste Profile", line2: "Rich & Smooth" },
+    ],
+    ingredients: [
+      "100% Raw Honey",
+      "Natural Pollen",
+      "Enzymes & Minerals",
+    ],
+  },
+  {
+    eyebrow: "Pure and Organic",
+    title: "Forest Honey",
+    tagline: "Sourced from deep forests with rich natural flavor.",
+    image: bottleImage, // ✅ same image
+    carouselLabel: "Forest Honey",
+    specs: [
+      { line1: "Source", line2: "Deep Forests" },
+      { line1: "Purity", line2: "100% Pure" },
+      { line1: "Processing", line2: "Raw & Natural" },
+      { line1: "Taste Profile", line2: "Earthy & Robust" },
+    ],
+    ingredients: [
+      "Wild Forest Honey",
+      "Natural Nectar",
+      "Trace Minerals",
+    ],
+  },
+  {
+    eyebrow: "Pure and Organic",
+    title: "Organic Honey",
+    tagline: "Crafted for purity and everyday wellness.",
+    image: bottleImage, // ✅ same image
+    carouselLabel: "Organic Honey",
+    specs: [
+      { line1: "Source", line2: "Certified Farms" },
+      { line1: "Purity", line2: "100% Organic" },
+      { line1: "Processing", line2: "Cold-Pressed" },
+      { line1: "Taste Profile", line2: "Mild & Sweet" },
+    ],
+    ingredients: [
+      "Certified Organic Honey",
+      "No Pesticides",
+      "Non-GMO",
+    ],
+  },
+];

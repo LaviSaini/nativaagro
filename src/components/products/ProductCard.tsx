@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
 
 export default function ProductCard({
   product,
@@ -14,59 +13,68 @@ export default function ProductCard({
     name: string;
     price: number;
     description?: string;
-    image?: string;
+    image?: any;
   };
   onAddToCart?: () => void;
   showQuickView?: boolean;
 }) {
   return (
-    <div className="rounded-3xl border border-zinc-200 bg-white p-5">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-zinc-100">
-        <Image
-          src={product.image || "/products/raw-honey-250g.svg"}
-          alt={product.name}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-      </div>
+    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+      
+      {/* IMAGE SECTION */}
+      <div className="relative h-[260px] w-full bg-[#f3f3f3]">
+        
+        {/* split background */}
+        {/* <div className="absolute inset-0 grid grid-cols-2">
+          <div className="bg-[#F4F4F4]" />
+        </div> */}
 
-      <div className="mt-4 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <Link href={`/products/${product._id}`} className="block">
-            <h3 className="truncate text-sm font-semibold tracking-wide text-zinc-900">
-              {product.name}
-            </h3>
-          </Link>
-          <p className="mt-1 text-xs text-zinc-500">
-            Subscribe &amp; Save 15%:{" "}
-            <span className="text-zinc-900">₹{Math.round(product.price * 0.85)}</span>
-          </p>
-          <p className="mt-1 text-xs text-zinc-500">
-            Get Once: <span className="text-zinc-900">₹{Math.round(product.price)}</span>
-          </p>
-        </div>
-
-        {showQuickView ? (
+        {/* Quick View */}
+        {showQuickView && (
           <Link
             href={`/products/${product._id}`}
-            className="shrink-0 rounded-full border border-zinc-300 px-3 py-1 text-[11px] uppercase tracking-widest text-zinc-700 hover:bg-zinc-50"
+            className="absolute underline underline-offset-4 decoration-1 right-4 top-4 z-20 flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-700"
           >
-            Quick view
+            QUICK VIEW 👁
           </Link>
-        ) : null}
+        )}
+
+        {/* Product Image */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <div className="relative h-[200px] w-[140px]">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
+
       </div>
 
-      <div className="mt-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => onAddToCart?.()}
-        >
-          Add to cart
-        </Button>
+      {/* CONTENT */}
+      <div className="p-4">
+        <h3 className="text-base font-medium">
+          {product.name}
+        </h3>
+
+        <p className="mt-1 text-sm text-[#7D4739]">
+          Subscribe & Save 15%: ₹{Math.round(product.price * 0.85)}
+        </p>
+
+        <p className="mt-1 text-lg font-semibold text-[#4E5F57]">
+          Get Once: ₹{product.price}
+        </p>
       </div>
+
+      {/* BUTTON */}
+      <button
+        onClick={() => onAddToCart?.()}
+        className="w-full FeaturedAddtoCartButton py-3 text-sm font-medium uppercase tracking-wide text-white hover:opacity-90"
+      >
+        Add to cart
+      </button>
     </div>
   );
 }
-

@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { clearAuthToken, getAuthUser, type AuthUser } from "@/lib/auth";
 import { ButtonLink } from "@/components/ui/Button";
+import Image from "next/image";
+import Logo from "../../public/home/logo.png"
 
 const navLinks: Array<{ href: string; label: string }> = [
   { href: "/", label: "Home" },
@@ -80,8 +82,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-[color:var(--accent)]/25 bg-[color:var(--surface)]/95 backdrop-blur-md">
       <div className="relative mx-auto flex h-[72px] max-w-[1240px] items-center px-4 sm:px-5">
         <Link href="/" className="flex shrink-0 items-center gap-2 text-[color:var(--ink)]">
-          <LeafIcon />
-          <span className="text-xl font-semibold tracking-tight md:text-2xl">Native</span>
+          <Image src={Logo} alt="Nativa Agro" className="object-contain" />
         </Link>
 
         <nav
@@ -94,9 +95,8 @@ export default function Header() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`text-[15px] font-medium transition ${
-                  active ? "text-[color:var(--ink)]" : "text-[#201914]/80 hover:text-[color:var(--ink)]"
-                }`}
+                className={`text-[15px] font-medium transition ${active ? "text-[color:var(--ink)]" : "text-[#201914]/80 hover:text-[color:var(--ink)]"
+                  }`}
               >
                 {l.label}
               </Link>

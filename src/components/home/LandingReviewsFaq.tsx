@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
+import Trustpilot from "../../../public/home/Trustpilot.png";
+import Image from "next/image";
+
+
 
 type Review = {
   name: string;
@@ -23,9 +27,8 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <span
           key={i}
-          className={`text-base leading-none ${
-            i < safe ? "text-[#F6973F]" : "text-[#F6973F]/30"
-          }`}
+          className={`text-base leading-none ${i < safe ? "text-[#F6973F]" : "text-[#F6973F]/30"
+            }`}
           aria-hidden="true"
         >
           ★
@@ -151,131 +154,203 @@ export default function LandingReviewsFaq() {
   }, []);
 
   return (
-    <section className="bg-[color:var(--muted)]">
-      <Container>
-      <div className="py-16">
-        <div className="grid items-center gap-10 md:grid-cols-12">
-          <div className="md:col-span-6">
-            <div className="relative rounded-[20px] bg-white/80 p-7 shadow-sm ring-1 ring-black/5">
-              <div className="h-16 w-16 rounded-full bg-zinc-100" />
-              <div className="mt-4">
-                <Stars rating={r.rating} />
-              </div>
-              <p className="mt-3 text-[18px] leading-[180%] text-[color:var(--ink)]/60">
-                “{r.text}”
-              </p>
-              <p className="mt-6 text-[24px] font-semibold leading-7 text-[color:var(--ink)]">
-                {r.name}
-              </p>
+    <>
+      <section className="bg-[#F5EFE6]">
+        <Container>
+          <div className="py-20">
+            <div className="grid items-center gap-6 sm:gap-16 md:grid-cols-12">
 
-              <div className="absolute left-6 top-1/2 -translate-y-1/2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setReviewIndex((p) => (p - 1 + reviews.length) % reviews.length)
-                  }
-                  className="grid h-12 w-12 place-items-center rounded-full border border-[color:var(--ink)] bg-white text-[color:var(--ink)]"
-                  aria-label="Previous review"
-                >
-                  ←
-                </button>
-              </div>
-              <div className="absolute left-6 top-1/2 translate-y-[calc(-50%+72px)]">
-                <button
-                  type="button"
-                  onClick={() => setReviewIndex((p) => (p + 1) % reviews.length)}
-                  className="grid h-12 w-12 place-items-center rounded-full border border-[color:var(--ink)] bg-white text-[color:var(--ink)]"
-                  aria-label="Next review"
-                >
-                  →
-                </button>
-              </div>
-            </div>
-          </div>
+              {/* LEFT - REVIEW CARD */}
+              <div className="relative md:col-span-6 overflow-visible">
 
-          <div className="md:col-span-6">
-            <h2 className="text-[60px] font-semibold leading-[72px] text-[color:var(--ink)]">
-              Reviews
-            </h2>
-            <p className="mt-5 text-[18px] leading-[27px] text-[#212224]">
-              Creating a sustainable and environmentally conscious impact on the world is vital
-              to everything we do. We ensure our choices not only protect, but allow ecosystems
-              to flourish.
-            </p>
-            {reviewsError ? (
-              <p className="mt-4 text-sm text-red-700">{reviewsError}</p>
-            ) : loadingReviews ? (
-              <p className="mt-4 text-sm text-[color:var(--text)]">Loading latest reviews…</p>
-            ) : null}
-            <div className="mt-10">
-              <ButtonLink href="/products" className="w-full max-w-[349px]">
-                View All
-              </ButtonLink>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-16">
-          <h2 className="text-center text-[60px] font-semibold leading-[72px] text-[color:var(--ink)]">
-            FAQs
-          </h2>
-
-          <div className="mt-10 space-y-4">
-            {faqs.map((f, idx) => {
-              const isOpen = idx === open;
-              return (
+                {/* Arrows */}
+                {/* Arrows */}
                 <div
-                  key={f.q}
-                  className={`rounded-[0px] ${
-                    isOpen ? "bg-[color:var(--brand)] text-white" : "bg-transparent"
-                  }`}
+                  className="
+                  absolute -left-16 top-1/2 hidden -translate-y-1/2 flex-col gap-4 
+                  md:flex
+                  DesktopNavigation
+                "
                 >
                   <button
-                    type="button"
-                    onClick={() => setOpen((p) => (p === idx ? -1 : idx))}
-                    className="flex w-full items-center gap-4 px-8 py-6 text-left"
+                    onClick={() =>
+                      setReviewIndex((p) => (p - 1 + reviews.length) % reviews.length)
+                    }
+                    className="grid h-12 w-12 place-items-center cursor-pointer rounded-full border border-[#2B2B2B] text-[#2B2B2B] hover:bg-white"
                   >
-                    <span
-                      className={`text-[24px] leading-[29px] ${
-                        isOpen ? "text-white" : "text-[color:var(--ink)]"
-                      }`}
-                    >
-                      {f.q}
-                    </span>
-                    <span
-                      className={`ml-auto hidden h-px flex-1 border-t ${
-                        isOpen ? "border-white/80 border-dashed" : "border-[#97A7AE] border-dashed"
-                      } md:block`}
-                    />
-                    <span
-                      className={`ml-auto grid h-7 w-7 place-items-center rounded border ${
-                        isOpen ? "border-white text-white" : "border-[color:var(--ink)] text-[color:var(--ink)]"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {isOpen ? "−" : "+"}
-                    </span>
+                    ↑
                   </button>
 
-                  {isOpen ? (
-                    <div className="px-8 pb-7">
-                      <p className="max-w-[1176px] text-[18px] leading-[26px] tracking-[0.715px] text-white">
-                        {f.a}{" "}
-                        <Link href="/contact" className="underline underline-offset-4">
-                          Contact us
-                        </Link>{" "}
-                        if you have more questions.
-                      </p>
-                    </div>
-                  ) : null}
+                  <button
+                    onClick={() =>
+                      setReviewIndex((p) => (p + 1) % reviews.length)
+                    }
+                    className="grid h-12 w-12 place-items-center cursor-pointer rounded-full border border-[#2B2B2B] text-[#2B2B2B] hover:bg-white"
+                  >
+                    ↓
+                  </button>
                 </div>
-              );
-            })}
+
+                {/* Card */}
+                <div className="relative rounded-[20px] bg-white/90 p-8 shadow-sm">
+
+                  {/* Trustpilot badge */}
+                  <div className="absolute -top-6 left-6 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+                    <Image
+                      src={Trustpilot}
+                      alt="Trustpilot"
+                      className="object-contain"
+                    />
+                  </div>
+
+                  {/* Name */}
+                  <h3 className="text-[20px] font-semibold text-[#1F1F1F]">
+                    {r.name}
+                  </h3>
+
+                  {/* Stars */}
+                  <div className="mt-2">
+                    <Stars rating={r.rating} />
+                  </div>
+
+                  {/* Text */}
+                  <p className="mt-4 text-[16px] leading-7 text-[#5F5F5F]">
+                    “{r.text}”
+                  </p>
+                </div>
+                <div className="mt-6 flex justify-center gap-4 md:hidden mobileNavigation">
+                  <button
+                    onClick={() =>
+                      setReviewIndex((p) => (p - 1 + reviews.length) % reviews.length)
+                    }
+                    className="grid h-12 w-12 place-items-center rounded-full border cursor-pointer border-[#2B2B2B] text-[#2B2B2B] hover:bg-white"
+                  >
+                    ←
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setReviewIndex((p) => (p + 1) % reviews.length)
+                    }
+                    className="grid h-12 w-12 place-items-center cursor-pointer rounded-full border border-[#2B2B2B] text-[#2B2B2B] hover:bg-white"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+
+              {/* RIGHT CONTENT */}
+              <div className="md:col-span-6">
+                <h2 className="text-[56px] text-center md:text-left font-semibold leading-[64px] text-[#1F1F1F]">
+                  Reviews
+                </h2>
+
+                <p className="mt-6 text-[18px] leading-[30px] text-[#4A4A4A]">
+                  Creating a sustainable and environmentally conscious impact on the world is vital
+                  to everything we do. In the built environment, we have a responsibility to our
+                  communities and ecosystems to ensure our choices not only protect, but allow them
+                  to flourish.
+                </p>
+
+                {/* Button */}
+                <div className="mt-10">
+                  <button className="rounded-md bg-[#5C6F63] px-10 cursor-pointer py-4 text-sm font-medium uppercase tracking-wide text-white hover:opacity-90">
+                    READ MORE
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
-        </div>
-      </div>
-      </Container>
-    </section>
+        </Container>
+      </section>
+      <section>
+        <Container>
+          <div className="py-16">
+            <div className="mt-16">
+
+              {/* Heading */}
+              <h2 className="text-center md:text-left text-[clamp(2.5rem,4vw,3.75rem)] font-semibold leading-tight tracking-[-0.02em] text-[color:var(--ink)]">
+                FAQs
+              </h2>
+
+              {/* List */}
+              <div className="mt-10 space-y-4">
+                {faqs.map((f, idx) => {
+                  const isOpen = idx === open;
+
+                  return (
+                    <div
+                      key={f.q}
+                      className={`
+                  rounded-xl transition-all duration-300
+                  ${isOpen
+                          ? "bg-[color:var(--brand)] text-white shadow-md"
+                          : "bg-transparent hover:bg-black/5"}
+                `}
+                    >
+                      {/* Question */}
+                      <button
+                        type="button"
+                        onClick={() => setOpen((p) => (p === idx ? -1 : idx))}
+                        className="flex w-full items-center cursor-pointer gap-4 px-6 md:px-8 py-5 text-left"
+                      >
+                        <span
+                          className={`
+                      text-[20px] md:text-[22px] leading-snug font-medium
+                      ${isOpen ? "text-white" : "text-[color:var(--ink)]"}
+                    `}
+                        >
+                          {f.q}
+                        </span>
+
+                        {/* Divider */}
+                        <span
+                          className={`
+                      ml-auto hidden h-px flex-1 border-t border-dashed
+                      ${isOpen ? "border-white/70" : "border-[#97A7AE]"}
+                      md:block
+                    `}
+                        />
+
+                        {/* Icon */}
+                        <span
+                          className={`
+                      ml-auto grid h-8 w-8 place-items-center rounded-md border text-sm transition
+                      ${isOpen
+                              ? "border-white text-white"
+                              : "border-[color:var(--ink)] text-[color:var(--ink)]"}
+                    `}
+                        >
+                          {isOpen ? "−" : "+"}
+                        </span>
+                      </button>
+
+                      {/* Answer */}
+                      {isOpen && (
+                        <div className="px-6 md:px-8 pb-6 md:pb-7">
+                          <p className="max-w-[1100px] text-[16px] md:text-[17px] leading-relaxed tracking-[0.3px] text-white/90">
+                            {f.a}{" "}
+                            <Link
+                              href="/contact"
+                              className="underline underline-offset-4 hover:opacity-80"
+                            >
+                              Contact us
+                            </Link>{" "}
+                            if you have more questions.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          </div>
+        </Container>
+      </section>
+    </>
   );
 }
 
