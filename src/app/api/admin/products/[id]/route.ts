@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { verifyAdmin } from "@/lib/admin";
 import { connectToDatabase } from "@/lib/db";
+import { parseFaqs, parseHighlights } from "@/lib/product-fields";
+import { parseProductImagesBody } from "@/lib/product-images";
 
 export async function PUT(
   request: Request,
@@ -20,7 +22,17 @@ export async function PUT(
 
     const db = await connectToDatabase();
     const body = await request.json();
-    const { name, description, price, categoryId, stock, image } = body;
+    const {
+      name,
+      description,
+      price,
+      categoryId,
+      stock,
+      packSize,
+      promoLine,
+      highlights,
+      faqs,
+    } = body;
 
     const update: Record<string, unknown> = { updatedAt: new Date() };
     if (name !== undefined) update.name = name;
@@ -28,7 +40,23 @@ export async function PUT(
     if (price !== undefined) update.price = Number(price);
     if (categoryId !== undefined) update.categoryId = categoryId;
     if (stock !== undefined) update.stock = Number(stock);
-    if (image !== undefined) update.image = image;
+    if (body.images !== undefined || body.image !== undefined) {
+      const images = parseProductImagesBody(body as Record<string, unknown>);
+      update.images = images;
+      update.image = images[0] || "";
+    }
+    if (packSize !== undefined) {
+      update.packSize = typeof packSize === "string" ? packSize.trim() : "";
+    }
+    if (promoLine !== undefined) {
+      update.promoLine = typeof promoLine === "string" ? promoLine.trim() : "";
+    }
+    if (highlights !== undefined) {
+      update.highlights = parseHighlights(highlights);
+    }
+    if (faqs !== undefined) {
+      update.faqs = parseFaqs(faqs);
+    }
 
     const result = await db.collection("products").updateOne(
       { _id: new ObjectId(id) },

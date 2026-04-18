@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { verifyAdmin } from "@/lib/admin";
 import { connectToDatabase } from "@/lib/db";
+import { parseFaqs, parseHighlights } from "@/lib/product-fields";
+import { parseProductImagesBody } from "@/lib/product-images";
 
 export async function GET(request: Request) {
   const auth = await verifyAdmin(request);
@@ -28,7 +30,18 @@ export async function POST(request: Request) {
   try {
     const db = await connectToDatabase();
     const body = await request.json();
-    const { name, description, price, categoryId, stock, image } = body;
+    const {
+      name,
+      description,
+      price,
+      categoryId,
+      stock,
+      packSize,
+      promoLine,
+      highlights,
+      faqs,
+    } = body;
+    const images = parseProductImagesBody(body as Record<string, unknown>);
 
     if (!name || price == null) {
       return NextResponse.json(
@@ -43,7 +56,12 @@ export async function POST(request: Request) {
       price: Number(price),
       categoryId: categoryId || "",
       stock: Number(stock) || 0,
-      image: image || "",
+      images,
+      image: images[0] || "",
+      packSize: typeof packSize === "string" ? packSize.trim() : "",
+      promoLine: typeof promoLine === "string" ? promoLine.trim() : "",
+      highlights: parseHighlights(highlights),
+      faqs: parseFaqs(faqs),
       createdAt: new Date(),
       updatedAt: new Date(),
     });

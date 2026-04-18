@@ -31,6 +31,30 @@ async function main() {
   const catIds = Object.values(catResult.insertedIds).map((id) => id.toString());
 
   // Products
+  const honeyHighlights = [
+    "100% pure & natural",
+    "Unfiltered for maximum nutrients",
+    "Sourced from trusted beekeepers",
+    "No added sugar or artificial flavours",
+  ];
+
+  const honeyFaqs = [
+    {
+      question: "What is raw honey?",
+      answer:
+        "Raw honey is collected and packed with minimal processing so it keeps natural enzymes, aroma, and texture.",
+    },
+    {
+      question: "Why does my honey crystallize?",
+      answer:
+        "Crystallization is natural for raw honey. Gently warm the jar in water to reliquefy—do not boil.",
+    },
+    {
+      question: "How should I store it?",
+      answer: "Store at room temperature in a dry place. A tight lid keeps moisture out.",
+    },
+  ];
+
   const products = [
     {
       name: "Raw Honey 250g",
@@ -38,8 +62,13 @@ async function main() {
         "Bringing pure, unprocessed honey straight from nature to your home, naturally.",
       price: 300,
       stock: 120,
+      images: ["/products/raw-honey-250g.svg"],
       image: "/products/raw-honey-250g.svg",
       categoryId: catIds[0],
+      packSize: "250g jar",
+      promoLine: "Small jar — perfect to try our hive-to-home flavour.",
+      highlights: honeyHighlights,
+      faqs: honeyFaqs,
       createdAt: now,
     },
     {
@@ -48,8 +77,33 @@ async function main() {
         "Unfiltered and unprocessed for maximum nutrients—rich, smooth taste.",
       price: 520,
       stock: 80,
+      images: ["/products/raw-honey-500g.svg", "/products/raw-honey-250g.svg"],
       image: "/products/raw-honey-500g.svg",
       categoryId: catIds[0],
+      packSize: "500g jar",
+      promoLine: "Best value for families — same purity, more golden goodness.",
+      highlights: honeyHighlights,
+      faqs: honeyFaqs,
+      createdAt: now,
+    },
+    {
+      name: "Clover Blossom Honey 400g",
+      description:
+        "Light, floral notes from spring clover—lovely in tea, on toast, or by the spoonful.",
+      price: 420,
+      stock: 95,
+      images: ["/products/raw-honey-250g.svg", "/products/raw-honey-500g.svg"],
+      image: "/products/raw-honey-250g.svg",
+      categoryId: catIds[0],
+      packSize: "400g jar",
+      promoLine: "Floral clover profile — delicate sweetness for everyday rituals.",
+      highlights: [
+        "Single-origin clover nectar",
+        "Smooth, spreadable texture",
+        "Ideal for tea and baking",
+        "Lab-tested for purity",
+      ],
+      faqs: honeyFaqs,
       createdAt: now,
     },
     {
@@ -57,8 +111,27 @@ async function main() {
       description: "Cold-pressed oil with a bold aroma and clean finish.",
       price: 450,
       stock: 60,
+      images: ["/products/raw-honey-500g.svg"],
       image: "/products/raw-honey-500g.svg",
       categoryId: catIds[1],
+      packSize: "500 ml bottle",
+      promoLine: "Cold-pressed in small batches — bold aroma for Indian cooking.",
+      highlights: [
+        "Cold-pressed extraction",
+        "No chemical refining",
+        "High smoke point for sautéing",
+        "Glass bottle friendly",
+      ],
+      faqs: [
+        {
+          question: "Is this oil filtered?",
+          answer: "We use minimal mechanical filtration to keep natural flavour and nutrients.",
+        },
+        {
+          question: "How do I store mustard oil?",
+          answer: "Keep in a cool, dark place. Refrigeration is optional and may cause slight clouding.",
+        },
+      ],
       createdAt: now,
     },
   ];
@@ -87,6 +160,17 @@ async function main() {
       publishedAt: new Date("2024-02-10T00:00:00.000Z"),
       content:
         "Raw honey can crystallize over time. This is normal.\n\nStore it at room temperature and avoid refrigeration.\n",
+      createdAt: now,
+    },
+    {
+      title: "Why Raw Honey Tastes Different Every Season",
+      excerpt: "Nectar flows and weather shape each harvest—here is what changes in the jar.",
+      category: "Beekeeping",
+      coverImage: "/blogs/eco-friendly-beekeeping.svg",
+      author: "Nativa Agro",
+      publishedAt: new Date("2024-03-18T00:00:00.000Z"),
+      content:
+        "Honey reflects the plants bees forage on. Spring clover, summer wildflowers, and autumn blooms each leave a distinct fingerprint on aroma and finish.\n",
       createdAt: now,
     },
   ];

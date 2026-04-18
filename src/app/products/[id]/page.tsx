@@ -1,8 +1,11 @@
 import Link from "next/link";
 import AddToCartForm from "./AddToCartForm";
+import ProductImageGallery from "./ProductImageGallery";
 import Container from "@/components/ui/Container";
 import ProductCard from "@/components/products/ProductCard";
 import { ButtonLink } from "@/components/ui/Button";
+import { parseFaqs, parseHighlights } from "@/lib/product-fields";
+import { normalizeProductImages } from "@/lib/product-images";
 
 async function getProduct(id: string) {
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -55,6 +58,13 @@ export default async function ProductPage({
     );
   }
 
+  const highlights = parseHighlights(product.highlights);
+  const faqs = parseFaqs(product.faqs);
+  const galleryImages = normalizeProductImages(product);
+  const promoLine =
+    (typeof product.promoLine === "string" && product.promoLine.trim()) ||
+    "FREE delivery by Tomorrow. Order within 8 hrs, 45 mins.";
+
   return (
     <main className="bg-white">
       <Container>
@@ -68,7 +78,7 @@ export default async function ProductPage({
 
           <div className="mt-6 grid gap-10 md:grid-cols-12">
             <div className="md:col-span-7">
-              <div className="aspect-[4/3] w-full rounded-[32px] border border-zinc-200 bg-zinc-100" />
+              <ProductImageGallery images={galleryImages} productName={product.name} />
 
               <div className="mt-8 rounded-3xl border border-zinc-200 p-6">
                 <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-900">
@@ -78,19 +88,16 @@ export default async function ProductPage({
                   {product.description ||
                     "Our raw honey is perfect for daily consumption, offering natural sweetness along with essential nutrients to support overall well-being."}
                 </p>
-                <ul className="mt-6 grid gap-2 text-sm text-zinc-700 sm:grid-cols-2">
-                  {[
-                    "100% Pure & Natural",
-                    "Unfiltered & Unprocessed for maximum nutrients",
-                    "Sourced directly from trusted beekeepers",
-                    "Free from additives and artificial sugars",
-                  ].map((t) => (
-                    <li key={t} className="flex gap-2">
-                      <span className="mt-1 inline-block h-2 w-2 rounded-full bg-zinc-900" />
-                      <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
+                {highlights.length > 0 ? (
+                  <ul className="mt-6 grid gap-2 text-sm text-zinc-700 sm:grid-cols-2">
+                    {highlights.map((t) => (
+                      <li key={t} className="flex gap-2">
+                        <span className="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-zinc-900" />
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
             </div>
 
@@ -102,9 +109,7 @@ export default async function ProductPage({
                 <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900">
                   {product.name}
                 </h1>
-                <p className="mt-3 text-sm text-zinc-600">
-                  FREE delivery by Tomorrow. Order within 8 hrs, 45 mins.
-                </p>
+                <p className="mt-3 text-sm text-zinc-600">{promoLine}</p>
 
                 <div className="mt-6 rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
                   <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
@@ -175,35 +180,28 @@ export default async function ProductPage({
                 </div>
               </div>
 
-              <div className="mt-8 rounded-3xl border border-zinc-200 bg-zinc-50 p-6">
-                <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-900">
-                  FAQs
-                </h2>
-                <div className="mt-4 space-y-3 text-sm text-zinc-700">
-                  <details className="rounded-2xl border border-zinc-200 bg-white p-4">
-                    <summary className="cursor-pointer font-medium text-zinc-900">
-                      What is raw honey?
-                    </summary>
-                    <p className="mt-3 text-sm leading-6 text-zinc-600">
-                      Raw honey is natural honey that is unprocessed and unfiltered,
-                      retaining its original nutrients and rich flavor.
-                    </p>
-                  </details>
-                  {[
-                    "How is raw honey different from regular honey?",
-                    "Does raw honey contain added sugar?",
-                    "How should I store honey?",
-                    "Is crystallization of honey normal?",
-                  ].map((q) => (
-                    <div
-                      key={q}
-                      className="rounded-2xl border border-zinc-200 bg-white p-4"
-                    >
-                      {q}
-                    </div>
-                  ))}
+              {faqs.length > 0 ? (
+                <div className="mt-8 rounded-3xl border border-zinc-200 bg-zinc-50 p-6">
+                  <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-900">
+                    FAQs
+                  </h2>
+                  <div className="mt-4 space-y-3 text-sm text-zinc-700">
+                    {faqs.map((faq, idx) => (
+                      <details
+                        key={`${idx}-${faq.question.slice(0, 48)}`}
+                        className="rounded-2xl border border-zinc-200 bg-white p-4"
+                      >
+                        <summary className="cursor-pointer font-medium text-zinc-900">
+                          {faq.question}
+                        </summary>
+                        {faq.answer ? (
+                          <p className="mt-3 text-sm leading-6 text-zinc-600">{faq.answer}</p>
+                        ) : null}
+                      </details>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </div>
 

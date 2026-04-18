@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { getSessionId } from "@/lib/checkout";
+import { normalizeProductImages } from "@/lib/product-images";
+import { ProductImageSlider } from "@/components/products/ProductImageSlider";
 
 export default function ProductCard({
   product,
@@ -13,44 +17,58 @@ export default function ProductCard({
     name: string;
     price: number;
     description?: string;
-    image?: any;
+    image?: unknown;
+    images?: unknown;
   };
-  onAddToCart?: () => void;
+  onAddToCart?: () => void | Promise<void>;
   showQuickView?: boolean;
 }) {
+  const router = useRouter();
+  const [adding, setAdding] = useState(false);
+  const galleryUrls = normalizeProductImages(product);
+
+  const handleAddToCart = useCallback(async () => {
+    if (onAddToCart) {
+      await onAddToCart();
+      return;
+    }
+    setAdding(true);
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product._id,
+          quantity: 1,
+          sessionId: getSessionId(),
+        }),
+      });
+      if (res.ok) {
+        router.push("/cart");
+      }
+    } finally {
+      setAdding(false);
+    }
+  }, [onAddToCart, product._id, router]);
+
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
       
-      {/* IMAGE SECTION */}
-      <div className="relative h-[260px] w-full bg-[#f3f3f3]">
-        
-        {/* split background */}
-        {/* <div className="absolute inset-0 grid grid-cols-2">
-          <div className="bg-[#F4F4F4]" />
-        </div> */}
-
-        {/* Quick View */}
+      {/* IMAGE SECTION — slider when multiple images */}
+      <div className="relative">
         {showQuickView && (
           <Link
             href={`/products/${product._id}`}
-            className="absolute underline underline-offset-4 decoration-1 right-4 top-4 z-20 flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-700"
+            className="absolute right-4 top-4 z-30 flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-700 underline underline-offset-4 decoration-1"
           >
             QUICK VIEW 👁
           </Link>
         )}
-
-        {/* Product Image */}
-        <div className="absolute inset-0 z-10 flex items-center justify-center">
-          <div className="relative h-[200px] w-[140px]">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-contain"
-            />
-          </div>
-        </div>
-
+        <ProductImageSlider
+          images={galleryUrls}
+          alt={product.name}
+          variant="card"
+        />
       </div>
 
       {/* CONTENT */}
@@ -70,10 +88,12 @@ export default function ProductCard({
 
       {/* BUTTON */}
       <button
-        onClick={() => onAddToCart?.()}
-        className="w-full FeaturedAddtoCartButton py-3 text-sm font-medium uppercase tracking-wide text-white hover:opacity-90"
+        type="button"
+        disabled={adding}
+        onClick={() => void handleAddToCart()}
+        className="w-full FeaturedAddtoCartButton py-3 text-sm font-medium uppercase tracking-wide text-white hover:opacity-90 disabled:opacity-60"
       >
-        Add to cart
+        {adding ? "Adding…" : "Add to cart"}
       </button>
     </div>
   );

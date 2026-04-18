@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Suspense } from "react";
 import "./globals.css";
-import HeaderWrapper from "@/components/HeaderWrapper";
-import FooterWrapper from "@/components/FooterWrapper";
+import HeaderGate from "@/components/HeaderGate";
+import FooterGate from "@/components/FooterGate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense fallback={<div className="h-[120px] border-b border-zinc-200 bg-white" />}>
-          <HeaderWrapper />
-        </Suspense>
+        <HeaderGate />
         <div className="min-h-[calc(100vh-72px)]">{children}</div>
-        <Suspense fallback={null}>
-          <FooterWrapper />
-        </Suspense>
+        <FooterGate />
       </body>
     </html>
   );

@@ -1,5 +1,28 @@
+import Image from "next/image";
 import Container from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
+
+const DEFAULT_BLOG_COVER = "/blogs/eco-friendly-beekeeping.svg";
+
+function BlogCoverImage({ src, alt }: { src?: string | null; alt: string }) {
+  const resolved = (typeof src === "string" && src.trim()) ? src.trim() : DEFAULT_BLOG_COVER;
+  if (resolved.startsWith("http://") || resolved.startsWith("https://")) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={resolved} alt={alt} className="h-full w-full object-cover" />
+    );
+  }
+  return (
+    <Image
+      src={resolved}
+      alt={alt}
+      fill
+      className="object-cover"
+      sizes="(max-width: 768px) 100vw, 42rem"
+      priority
+    />
+  );
+}
 
 async function getBlog(id: string) {
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -64,7 +87,9 @@ export default async function BlogDetailPage({
           </div>
 
           <div className="mt-10 rounded-3xl border border-zinc-200 bg-white p-8">
-            <div className="aspect-[16/9] w-full rounded-2xl bg-zinc-100" />
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-zinc-100">
+              <BlogCoverImage src={blog.coverImage} alt={blog.title} />
+            </div>
             <div className="mt-8 whitespace-pre-wrap text-sm leading-7 text-zinc-700">
               {blog.content}
             </div>

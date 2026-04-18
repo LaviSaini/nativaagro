@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { adminFetch } from "@/lib/admin-api";
-import { AdminImageField } from "@/components/admin/AdminImageField";
+import { AdminProductImagesField } from "@/components/admin/AdminProductImagesField";
+import { ProductExtraFields, type FaqRow } from "@/components/admin/ProductExtraFields";
+import { parseFaqs } from "@/lib/product-fields";
+import { normalizeProductImages } from "@/lib/product-images";
 
 interface Category {
   _id: string;
@@ -25,8 +28,12 @@ export default function EditProductPage() {
     price: "",
     categoryId: "",
     stock: "0",
-    image: "",
+    packSize: "",
+    promoLine: "",
+    highlightsText: "",
   });
+  const [faqs, setFaqs] = useState<FaqRow[]>([]);
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     adminFetch("/api/admin/categories")
@@ -41,13 +48,19 @@ export default function EditProductPage() {
       .then((p) => {
         if (p) {
           setForm({
-            name: p.name || "",
-            description: p.description || "",
+            name: p.name ?? "",
+            description: p.description ?? "",
             price: String(p.price ?? ""),
-            categoryId: p.categoryId || "",
+            categoryId: p.categoryId ?? "",
             stock: String(p.stock ?? 0),
-            image: p.image || "",
+            packSize: p.packSize ?? "",
+            promoLine: p.promoLine ?? "",
+            highlightsText: Array.isArray(p.highlights)
+              ? p.highlights.map((x: unknown) => String(x)).join("\n")
+              : "",
           });
+          setFaqs(parseFaqs(p.faqs));
+          setImages(normalizeProductImages(p));
         }
       });
   }, [id]);
@@ -65,7 +78,11 @@ export default function EditProductPage() {
           price: parseFloat(form.price) || 0,
           categoryId: form.categoryId || undefined,
           stock: parseInt(form.stock, 10) || 0,
-          image: form.image || undefined,
+          images,
+          packSize: form.packSize,
+          promoLine: form.promoLine,
+          highlights: form.highlightsText,
+          faqs: faqs.filter((f) => f.question.trim()),
         }),
       });
       const data = await res.json();
@@ -93,7 +110,7 @@ export default function EditProductPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="max-w-xl space-y-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+        className="max-w-2xl space-y-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
       >
         {error && (
           <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
@@ -107,7 +124,7 @@ export default function EditProductPage() {
           <input
             type="text"
             required
-            value={form.name}
+            value={form.name ?? ""}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
           />
@@ -117,7 +134,7 @@ export default function EditProductPage() {
             Description
           </label>
           <textarea
-            value={form.description}
+            value={form.description ?? ""}
             onChange={(e) =>
               setForm((f) => ({ ...f, description: e.target.value }))
             }
@@ -134,7 +151,7 @@ export default function EditProductPage() {
               type="number"
               step="0.01"
               required
-              value={form.price}
+              value={form.price ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
               className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
             />
@@ -145,7 +162,7 @@ export default function EditProductPage() {
             </label>
             <input
               type="number"
-              value={form.stock}
+              value={form.stock ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
               className="mt-1 w-full rounded-lg border border-zinc-300 px-4 py-2"
             />
@@ -156,7 +173,7 @@ export default function EditProductPage() {
             Category
           </label>
           <select
-            value={form.categoryId}
+            value={form.categoryId ?? ""}
             onChange={(e) =>
               setForm((f) => ({ ...f, categoryId: e.target.value }))
             }
@@ -170,13 +187,17 @@ export default function EditProductPage() {
             ))}
           </select>
         </div>
-        <AdminImageField
-          label="Product image"
-          folder="products"
-          value={form.image}
-          onChange={(url) => setForm((f) => ({ ...f, image: url }))}
-          helpText="Upload replaces the stored path; file is saved under public/products."
+        <ProductExtraFields
+          highlightsText={form.highlightsText ?? ""}
+          onHighlightsTextChange={(highlightsText) => setForm((f) => ({ ...f, highlightsText }))}
+          packSize={form.packSize ?? ""}
+          onPackSizeChange={(packSize) => setForm((f) => ({ ...f, packSize }))}
+          promoLine={form.promoLine ?? ""}
+          onPromoLineChange={(promoLine) => setForm((f) => ({ ...f, promoLine }))}
+          faqs={faqs}
+          onFaqsChange={setFaqs}
         />
+        <AdminProductImagesField images={images} onChange={setImages} />
         <div className="flex gap-4">
           <button
             type="submit"

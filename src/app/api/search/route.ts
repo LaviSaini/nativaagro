@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function GET(request: Request) {
   try {
     const db = await connectToDatabase();
@@ -15,7 +19,7 @@ export async function GET(request: Request) {
       });
     }
 
-    const regex = { $regex: q, $options: "i" };
+    const regex = { $regex: escapeRegex(q), $options: "i" };
 
     const [products, categories, blogs] = await Promise.all([
       db

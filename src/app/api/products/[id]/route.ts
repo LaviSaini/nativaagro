@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { ObjectId } from "mongodb";
+import { normalizeProductImages } from "@/lib/product-images";
 
 export async function GET(
   _request: Request,
@@ -21,9 +22,12 @@ export async function GET(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    const images = normalizeProductImages(product);
     return NextResponse.json({
       ...product,
       _id: product._id.toString(),
+      images,
+      image: images[0] || "",
     });
   } catch {
     return NextResponse.json(

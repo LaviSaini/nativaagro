@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
+import { normalizeProductImages } from "@/lib/product-images";
 
 export async function GET(request: Request) {
   try {
@@ -7,6 +8,14 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const category = searchParams.get("category") || "";
+    const limitRaw = searchParams.get("limit");
+    let queryLimit = 0;
+    if (limitRaw != null && limitRaw !== "") {
+      const n = parseInt(limitRaw, 10);
+      if (Number.isFinite(n) && n > 0) {
+        queryLimit = Math.min(n, 100);
+      }
+    }
 
     const filter: Record<string, unknown> = {};
     if (search.trim()) {
@@ -29,12 +38,21 @@ export async function GET(request: Request) {
       delete filter.$or;
     }
 
-    const products = await db.collection("products").find(filter).toArray();
+    let cursor = db.collection("products").find(filter).sort({ createdAt: -1 });
+    if (queryLimit > 0) {
+      cursor = cursor.limit(queryLimit);
+    }
+    const products = await cursor.toArray();
     return NextResponse.json(
-      products.map((p) => ({
-        ...p,
-        _id: p._id.toString(),
-      }))
+      products.map((p) => {
+        const images = normalizeProductImages(p);
+        return {
+          ...p,
+          _id: p._id.toString(),
+          images,
+          image: images[0] || "",
+        };
+      })
     );
   } catch {
     return NextResponse.json(

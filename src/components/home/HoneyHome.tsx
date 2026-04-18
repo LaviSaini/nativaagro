@@ -56,9 +56,9 @@ export default function HoneyHome() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6 lg:gap-10">
-            {galleryImages.map((src) => (
+            {galleryImages.map((src,index) => (
               <div
-                
+                key={index}
                 className="relative aspect-[277/380] w-full overflow-hidden rounded-xl bg-zinc-100 shadow-sm ring-1 ring-black/5"
               >
                 <Image src={src} alt="Beekeeping and honey" fill className="object-cover" sizes="25vw" />

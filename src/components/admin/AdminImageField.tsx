@@ -7,12 +7,13 @@ import { adminUploadImage, type ImageUploadFolder } from "@/lib/admin-api";
 type Props = {
   label: string;
   folder: ImageUploadFolder;
-  value: string;
+  value: string | undefined | null;
   onChange: (publicUrl: string) => void;
   helpText?: string;
 };
 
 export function AdminImageField({ label, folder, value, onChange, helpText }: Props) {
+  const safeValue = value ?? "";
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -49,13 +50,20 @@ export function AdminImageField({ label, folder, value, onChange, helpText }: Pr
         ) : null}
       </div>
       {err ? <p className="mt-2 text-sm text-red-600">{err}</p> : null}
-      {value ? (
+      {safeValue ? (
         <div className="mt-3 flex items-start gap-4">
           <div className="relative h-24 w-24 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
-            <Image src={value} alt="Preview" fill className="object-cover" sizes="96px" unoptimized={value.endsWith(".svg")} />
+            <Image
+              src={safeValue}
+              alt="Preview"
+              fill
+              className="object-cover"
+              sizes="96px"
+              unoptimized={safeValue.endsWith(".svg")}
+            />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="break-all text-xs text-zinc-600">{value}</p>
+            <p className="break-all text-xs text-zinc-600">{safeValue}</p>
             <button
               type="button"
               onClick={() => onChange("")}

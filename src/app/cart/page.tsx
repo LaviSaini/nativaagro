@@ -2,14 +2,32 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getSessionId } from "@/lib/checkout";
 import Container from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
 
+const FALLBACK_PRODUCT_IMAGE = "/products/raw-honey-250g.svg";
+
+function CartLineImage({ image, name }: { image?: string; name: string }) {
+  const src = (typeof image === "string" && image.trim()) || FALLBACK_PRODUCT_IMAGE;
+  const remote = src.startsWith("http://") || src.startsWith("https://");
+  return (
+    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200/80">
+      {remote ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={name} className="h-full w-full object-contain p-1.5" />
+      ) : (
+        <Image src={src} alt={name} fill className="object-contain p-1.5" sizes="80px" />
+      )}
+    </div>
+  );
+}
+
 interface CartItem {
   productId: string;
   quantity: number;
-  product?: { name: string; price: number };
+  product?: { name: string; price: number; image?: string; packSize?: string };
 }
 
 interface CartData {
@@ -74,15 +92,20 @@ export default function CartPage() {
                     {items.map((item) => (
                       <li key={item.productId} className="py-5 first:pt-0 last:pb-0">
                         <div className="flex items-start gap-4">
-                          <div className="h-20 w-20 shrink-0 rounded-2xl bg-zinc-100" />
+                          <CartLineImage
+                            image={item.product?.image}
+                            name={item.product?.name || "Product"}
+                          />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold tracking-wide text-zinc-900">
                               {item.product?.name || "Product"}
                             </p>
                             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-600">
-                              <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs">
-                                480g
-                              </span>
+                              {item.product?.packSize?.trim() ? (
+                                <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs">
+                                  {item.product.packSize.trim()}
+                                </span>
+                              ) : null}
                               <span className="text-xs text-zinc-500">
                                 Qty: {item.quantity}
                               </span>

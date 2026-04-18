@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { connectToDatabase } from "@/lib/db";
+import { normalizeProductImages } from "@/lib/product-images";
 
 export async function GET(request: Request) {
   try {
@@ -29,7 +30,18 @@ export async function GET(request: Request) {
       : [];
 
     const productMap = Object.fromEntries(
-      products.map((p) => [p._id.toString(), { name: p.name, price: p.price }])
+      products.map((p) => {
+        const imgs = normalizeProductImages(p);
+        return [
+          p._id.toString(),
+          {
+            name: p.name,
+            price: p.price,
+            image: imgs[0] || "",
+            packSize: typeof p.packSize === "string" ? p.packSize : "",
+          },
+        ];
+      })
     );
 
     const itemsWithProduct = items.map((i: { productId: string; quantity: number }) => ({
