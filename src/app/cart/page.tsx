@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getSessionId } from "@/lib/checkout";
 import Container from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
+import { QuantityStepper } from "@/components/QuantityStepper";
 
 const FALLBACK_PRODUCT_IMAGE = "/products/raw-honey-250g.svg";
 
@@ -34,19 +35,55 @@ interface CartData {
   items: CartItem[];
 }
 
+async function fetchCart(sessionId: string): Promise<CartData> {
+  const r = await fetch(`/api/cart?sessionId=${sessionId}`);
+  if (!r.ok) return { items: [] };
+  return r.json();
+}
+
 export default function CartPage() {
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [promo, setPromo] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const refreshCart = useCallback(async () => {
+    const sessionId = getSessionId();
+    const data = await fetchCart(sessionId);
+    setCart(data);
+  }, []);
 
   useEffect(() => {
+    refreshCart().finally(() => setLoading(false));
+  }, [refreshCart]);
+
+  async function removeLine(productId: string) {
     const sessionId = getSessionId();
-    fetch(`/api/cart?sessionId=${sessionId}`)
-      .then((r) => (r.ok ? r.json() : { items: [] }))
-      .then((data) => setCart(data))
-      .catch(() => setCart({ items: [] }))
-      .finally(() => setLoading(false));
-  }, []);
+    setUpdatingId(productId);
+    try {
+      await fetch(`/api/cart/${productId}?sessionId=${encodeURIComponent(sessionId)}`, {
+        method: "DELETE",
+      });
+      await refreshCart();
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function setLineQuantity(productId: string, nextQty: number) {
+    const sessionId = getSessionId();
+    setUpdatingId(productId);
+    try {
+      await fetch(`/api/cart/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, quantity: nextQty }),
+      });
+      await refreshCart();
+    } finally {
+      setUpdatingId(null);
+    }
+  }
 
   if (loading) {
     return (
@@ -91,27 +128,44 @@ export default function CartPage() {
                   <ul className="divide-y divide-zinc-200">
                     {items.map((item) => (
                       <li key={item.productId} className="py-5 first:pt-0 last:pb-0">
-                        <div className="flex items-start gap-4">
-                          <CartLineImage
-                            image={item.product?.image}
-                            name={item.product?.name || "Product"}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold tracking-wide text-zinc-900">
-                              {item.product?.name || "Product"}
-                            </p>
-                            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-600">
-                              {item.product?.packSize?.trim() ? (
-                                <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs">
-                                  {item.product.packSize.trim()}
-                                </span>
-                              ) : null}
-                              <span className="text-xs text-zinc-500">
-                                Qty: {item.quantity}
-                              </span>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                          <div className="flex gap-4">
+                            <CartLineImage
+                              image={item.product?.image}
+                              name={item.product?.name || "Product"}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-semibold tracking-wide text-zinc-900">
+                                {item.product?.name || "Product"}
+                              </p>
+                              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-zinc-600">
+                                {item.product?.packSize?.trim() ? (
+                                  <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs">
+                                    {item.product.packSize.trim()}
+                                  </span>
+                                ) : null}
+                              </div>
+                              <div className="mt-3 flex flex-wrap items-center gap-3">
+                                <QuantityStepper
+                                  value={item.quantity}
+                                  min={1}
+                                  max={999}
+                                  compact
+                                  disabled={updatingId === item.productId}
+                                  onChange={(n) => void setLineQuantity(item.productId, n)}
+                                />
+                                <button
+                                  type="button"
+                                  disabled={updatingId === item.productId}
+                                  onClick={() => void removeLine(item.productId)}
+                                  className="text-xs font-medium text-red-600 underline-offset-2 hover:underline disabled:opacity-40"
+                                >
+                                  Remove
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <p className="text-sm font-medium text-zinc-900">
+                          <p className="text-sm font-medium text-zinc-900 sm:ml-auto sm:shrink-0 sm:text-right">
                             ₹{Math.round((item.product?.price || 0) * item.quantity)}
                           </p>
                         </div>

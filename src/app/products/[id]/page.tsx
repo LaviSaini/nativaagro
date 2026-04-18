@@ -6,29 +6,7 @@ import ProductCard from "@/components/products/ProductCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { parseFaqs, parseHighlights } from "@/lib/product-fields";
 import { normalizeProductImages } from "@/lib/product-images";
-
-async function getProduct(id: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  try {
-    const res = await fetch(`${base}/api/products/${id}`, { cache: "no-store" });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-
-async function getRelatedProducts(limit = 3) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  try {
-    const res = await fetch(`${base}/api/products`, { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data || []).slice(0, limit);
-  } catch {
-    return [];
-  }
-}
+import { getStoreProductById, getStoreRelatedProducts } from "@/lib/server-products";
 
 export default async function ProductPage({
   params,
@@ -37,8 +15,8 @@ export default async function ProductPage({
 }) {
   const { id } = await params;
   const [product, related] = await Promise.all([
-    getProduct(id),
-    getRelatedProducts(3),
+    getStoreProductById(id),
+    getStoreRelatedProducts(id, 3),
   ]);
 
   if (!product) {
@@ -161,7 +139,10 @@ export default async function ProductPage({
                   </div>
 
                   <div className="mt-6">
-                    <AddToCartForm productId={product._id} />
+                    <AddToCartForm
+                      productId={product._id}
+                      maxStock={typeof product.stock === "number" ? product.stock : undefined}
+                    />
                     <div className="mt-3">
                       <ButtonLink href="/checkout" variant="outline" className="w-full">
                         Buy now

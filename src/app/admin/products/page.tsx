@@ -28,7 +28,12 @@ export default function AdminProductsPage() {
         }
         return r.json();
       })
-      .then(setProducts)
+      .then((data) => {
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid response from server");
+        }
+        setProducts(data);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"))
       .finally(() => setLoading(false));
   }, []);

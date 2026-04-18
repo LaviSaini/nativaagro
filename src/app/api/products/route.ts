@@ -27,13 +27,17 @@ export async function GET(request: Request) {
     if (category.trim()) {
       const cat = await db.collection("categories").findOne({ slug: category.trim() });
       if (cat) {
-        filter.categoryId = cat._id.toString();
+        const idStr = cat._id.toString();
+        const catMatch = {
+          $or: [{ categoryId: idStr }, { categoryId: cat._id }],
+        };
+        if (filter.$or) {
+          filter.$and = [{ $or: filter.$or as unknown[] }, catMatch];
+          delete filter.$or;
+        } else {
+          Object.assign(filter, catMatch);
+        }
       }
-    }
-    if (filter.$or && filter.categoryId) {
-      filter.$and = [{ $or: filter.$or }, { categoryId: filter.categoryId }];
-      delete filter.$or;
-      delete filter.categoryId;
     } else if (!filter.$or) {
       delete filter.$or;
     }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState, startTransition } from "react";
 import { getSessionId } from "@/lib/checkout";
 import { normalizeProductImages } from "@/lib/product-images";
 import { ProductImageSlider } from "@/components/products/ProductImageSlider";
@@ -27,6 +27,10 @@ export default function ProductCard({
   const [adding, setAdding] = useState(false);
   const galleryUrls = normalizeProductImages(product);
 
+  useEffect(() => {
+    router.prefetch("/cart");
+  }, [router]);
+
   const handleAddToCart = useCallback(async () => {
     if (onAddToCart) {
       await onAddToCart();
@@ -44,7 +48,9 @@ export default function ProductCard({
         }),
       });
       if (res.ok) {
-        router.push("/cart");
+        startTransition(() => {
+          router.push("/cart");
+        });
       }
     } finally {
       setAdding(false);

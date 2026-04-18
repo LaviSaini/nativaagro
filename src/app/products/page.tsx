@@ -1,34 +1,7 @@
 import Container from "@/components/ui/Container";
 import ProductCard from "@/components/products/ProductCard";
 import { ProductsToolbar } from "./toolbar";
-
-async function getCategories() {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  try {
-    const res = await fetch(`${base}/api/categories`, { cache: "no-store" });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
-}
-
-async function getProducts(search?: string, category?: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const params = new URLSearchParams();
-  if (search) params.set("search", search);
-  if (category) params.set("category", category);
-  const qs = params.toString();
-  try {
-    const res = await fetch(`${base}/api/products${qs ? `?${qs}` : ""}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
-}
+import { getStoreCategories, getStoreProductsList } from "@/lib/server-products";
 
 export default async function ProductsPage({
   searchParams,
@@ -37,8 +10,8 @@ export default async function ProductsPage({
 }) {
   const { search, category, sort } = await searchParams;
   const [products, categories] = await Promise.all([
-    getProducts(search, category),
-    getCategories(),
+    getStoreProductsList({ search, categorySlug: category }),
+    getStoreCategories(),
   ]);
 
   const sorted = [...products];
@@ -64,7 +37,7 @@ export default async function ProductsPage({
           />
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {sorted.map((product: { _id: string; name: string; price: number; description?: string }) => (
+            {sorted.map((product) => (
               <ProductCard key={product._id} product={product} showQuickView />
             ))}
           </div>

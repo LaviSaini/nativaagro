@@ -169,3 +169,21 @@ header{
     display: flex;
   }
 }
+
+/* App Router route loading overlay */
+@keyframes route-loader-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.route-fade-loader {
+  animation: route-loader-fade 0.18s ease-out forwards;
+}
+
+.route-fade-loader__backdrop {
+  animation: route-loader-fade 0.22s ease-out forwards;
+}
