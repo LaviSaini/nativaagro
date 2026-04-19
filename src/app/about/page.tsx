@@ -9,6 +9,7 @@ import Icon3 from "../../../public/products/Icon3.png";
 import Icon4 from "../../../public/products/Icon4.png";
 import Icon5 from "../../../public/products/Icon5.png";
 import Coming from "@/components/products/Coming";
+import TeamSection from "@/components/about/TeamSection";
 
 
 export default function AboutPage() {
@@ -207,23 +208,7 @@ export default function AboutPage() {
         </section>
         <Coming heading="Upcoming Products" />
 
-        <section className="mt-14 rounded-3xl border border-zinc-200 bg-zinc-50 p-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
-            Meet the Team
-          </h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
-            {[
-              { name: "Anuj Tiwari", bio: "Founder & beekeeper. Building purity-first products with care." },
-              { name: "Team Member", bio: "Operations & sourcing. Working with trusted local partners." },
-              { name: "Team Member", bio: "Customer experience. Helping you choose the right product." },
-            ].map((p) => (
-              <div key={p.name} className="rounded-2xl border border-zinc-200 bg-white p-6">
-                <p className="font-medium text-zinc-900">{p.name}</p>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">{p.bio}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+       <TeamSection/>
       </div>
     </main>
   );
