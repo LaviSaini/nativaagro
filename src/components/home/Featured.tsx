@@ -25,8 +25,7 @@ export default function Featured({ products }: { products: FeaturedProduct[] }) 
 
           {list.length === 0 ? (
             <div className="mt-10 rounded-2xl border border-zinc-200 bg-zinc-50 p-10 text-sm text-zinc-600">
-              No honey products yet. Run <code className="rounded bg-zinc-200 px-1">npm run seed:demo</code> or add
-              products in the Honey category.
+              No honey products yet. Check back soon!
             </div>
           ) : (
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

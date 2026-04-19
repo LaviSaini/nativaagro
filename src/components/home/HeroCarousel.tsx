@@ -53,16 +53,16 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
 
       <Container>
         <section className="relative z-10 py-16 md:py-24 min-h-[750px] flex items-center">
-          <div className="mx-auto grid w-full items-center gap-12 lg:grid-cols-12">
+          <div className="mx-auto grid w-full items-start gap-6 md:gap-12 lg:grid-cols-12 lg:items-center">
 
             {/* LEFT */}
-            <div className="lg:col-span-4 flex flex-col items-center lg:items-end text-center lg:text-right">
-              <div className="flex flex-col justify-content-start text-left">
+            <div className="lg:col-span-4 flex flex-col items-start lg:items-end text-left lg:text-right order-2 lg:order-1 w-full">
+              <div className="flex flex-col w-full text-center lg:text-left">
                 <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-[#555]">
                   DISCOVER OUR PRODUCTS
                 </p>
 
-                <h1 className="mt-3 text-[56px] font-bold leading-[1.05] text-[#1B1B1B] md:text-[68px] tracking-tight">
+                <h1 className="mt-3 text-[40px] font-bold leading-[1.05] text-[#1B1B1B] md:text-[60px] tracking-tight text-center lg:text-left">
                   {slide.title}
                 </h1>
 
@@ -70,7 +70,7 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
                   100% PURE RAW HONEY
                 </p>
               </div>
-              <div className="mt-16 text-[15px] text-[#555] leading-[1.8] font-medium">
+              <div className="mt-4 sm:mt-8 md:mt-16 text-[15px] text-[#555] leading-[1.8] font-medium w-full text-left lg:text-right">
                 <p className="mb-2 font-bold text-[#1B1B1B] text-[13px] tracking-[0.1em] uppercase">
                   INGREDIENTS
                 </p>
@@ -87,13 +87,13 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
                 ))}
               </div>
 
-              <button className="mt-12 w-[240px] cursor-pointer rounded-md bg-[#5E7163] py-4 text-[14px] font-bold uppercase tracking-[0.15em] text-white hover:bg-[#4D5E52] transition-colors shadow-lg">
+              <button className="mt-12 w-full lg:px-8 cursor-pointer rounded-md bg-[#5E7163] py-4 text-[14px] font-bold uppercase tracking-[0.15em] text-white hover:bg-[#4D5E52] transition-colors shadow-lg">
                 BUY NOW
               </button>
             </div>
 
             {/* CENTER */}
-            <div className="relative flex flex-col items-center justify-center lg:col-span-4 mt-16 lg:mt-0">
+            <div className="relative flex flex-col items-center justify-center lg:col-span-4 mt-8 lg:mt-0 order-1 lg:order-2 w-full">
 
               <div className="relative flex items-center justify-center w-full max-w-[340px] aspect-[3/4]">
                 {/* dashed container */}
@@ -140,12 +140,12 @@ export default function HeroCarousel({ slides }: { slides?: HeroSlide[] }) {
             </div>
 
             {/* RIGHT */}
-            <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left mt-16 lg:mt-0">
-              <p className="text-[16px] font-medium leading-[1.7] text-[#444] max-w-[320px]">
+            <div className="lg:col-span-4 flex flex-col items-start lg:items-start text-left mt-8 lg:mt-0 order-3 w-full">
+              <p className="text-[16px] font-medium leading-[1.7] text-[#444] w-full max-w-full lg:max-w-[320px]">
                 {slide.tagline}
               </p>
 
-              <div className="mt-12 flex flex-col w-full max-w-[340px]">
+              <div className="mt-12 flex flex-col w-full max-w-full lg:max-w-[340px]">
                 <div className="w-full h-px border-t-[1.5px] border-dotted border-[#C5BBA4]" />
 
                 <div className="flex">
