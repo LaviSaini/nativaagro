@@ -4,6 +4,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { clearAuthToken, getAuthUser, type AuthUser } from "@/lib/auth";
+import {
+  CART_UPDATED_EVENT,
+  fetchCartItemCount,
+} from "@/lib/cartClient";
 import { ButtonLink } from "@/components/ui/Button";
 import Image from "next/image";
 import Logo from "../../public/home/logo.png"
@@ -45,11 +49,30 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const mobileRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     setMobileOpen(false);
     setUser(getAuthUser());
   }, [pathname]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchCartItemCount().then((n) => {
+      if (!cancelled) setCartCount(n);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    function onCartUpdated() {
+      fetchCartItemCount().then(setCartCount);
+    }
+    window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
+    return () => window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -132,8 +155,8 @@ export default function Header() {
           </Link>
           <Link
             href="/cart"
-            className="grid h-10 w-10 place-items-center rounded-full text-[color:var(--ink)] transition hover:bg-white/70"
-            aria-label="Cart"
+            className="relative grid h-10 w-10 place-items-center rounded-full text-[color:var(--ink)] transition hover:bg-white/70"
+            aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path
@@ -146,6 +169,11 @@ export default function Header() {
               <circle cx="9" cy="20" r="1.5" fill="currentColor" />
               <circle cx="18" cy="20" r="1.5" fill="currentColor" />
             </svg>
+            {cartCount > 0 ? (
+              <span className="absolute -right-0.5 -top-0.5 flex min-h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-[#4E5F57] px-1 text-[10px] font-semibold leading-none text-white">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            ) : null}
           </Link>
           {user ? (
             <button
@@ -201,9 +229,14 @@ export default function Header() {
                 </Link>
                 <Link
                   href="/cart"
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
+                  className="flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-800 hover:bg-[color:var(--surface)]"
                 >
-                  Cart
+                  <span>Cart</span>
+                  {cartCount > 0 ? (
+                    <span className="rounded-full bg-[#4E5F57] px-2 py-0.5 text-xs font-semibold text-white">
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  ) : null}
                 </Link>
                 <Link
                   href={user ? "/account" : "/auth/login"}

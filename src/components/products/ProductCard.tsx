@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, startTransition } from "react";
 import { getSessionId } from "@/lib/checkout";
+import { notifyCartUpdated } from "@/lib/cartClient";
 import { normalizeProductImages } from "@/lib/product-images";
 import { ProductImageSlider } from "@/components/products/ProductImageSlider";
 
@@ -48,6 +49,7 @@ export default function ProductCard({
         }),
       });
       if (res.ok) {
+        notifyCartUpdated();
         startTransition(() => {
           router.push("/cart");
         });

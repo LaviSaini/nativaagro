@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import AdminGuard from "@/components/AdminGuard";
 import AdminNav from "./AdminNav";
+import PageSkeleton from "@/components/PageSkeleton";
 
 export default function AdminLayout({
   children,
@@ -39,7 +40,7 @@ export default function AdminLayout({
           </div>
         </aside>
         <main className="flex-1 overflow-auto p-8">
-          <Suspense fallback={<p className="text-zinc-600">Loading...</p>}>
+          <Suspense fallback={<PageSkeleton embedded />}>
             {children}
           </Suspense>
         </main>

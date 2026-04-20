@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import CheckoutGate from "@/components/CheckoutGate";
+import PageSkeleton from "@/components/PageSkeleton";
 
 export default function CheckoutLayout({
   children,
@@ -7,13 +8,7 @@ export default function CheckoutLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-          <p className="text-zinc-600">Loading...</p>
-        </div>
-      }
-    >
+    <Suspense fallback={<PageSkeleton />}>
       <CheckoutGate>{children}</CheckoutGate>
     </Suspense>
   );

@@ -68,8 +68,8 @@ export default function AboutPage() {
               "Direct sourcing from trusted beekeepers for transparency and purity.",
               "More than just honey — we promote natural living and everyday wellness.",
               "Sustainably sourced with respect for bees, nature, and the environment.",
-            ].map((t) => (
-              <div key={t} className="rounded-2xl border border-zinc-200 bg-white p-6">
+            ].map((t,key) => (
+              <div key={key} className="rounded-2xl border border-zinc-200 bg-white p-6">
                 <p className="text-sm leading-6 text-zinc-600">{t}</p>
               </div>
             ))}
@@ -85,8 +85,8 @@ export default function AboutPage() {
               { name: "Anuj Tiwari", bio: "Founder & beekeeper. Building purity-first products with care." },
               { name: "Team Member", bio: "Operations & sourcing. Working with trusted local partners." },
               { name: "Team Member", bio: "Customer experience. Helping you choose the right product." },
-            ].map((p) => (
-              <div key={p.name} className="rounded-2xl border border-zinc-200 bg-white p-6">
+            ].map((p,key) => (
+              <div key={key} className="rounded-2xl border border-zinc-200 bg-white p-6">
                 <p className="font-medium text-zinc-900">{p.name}</p>
                 <p className="mt-2 text-sm leading-6 text-zinc-600">{p.bio}</p>
               </div>

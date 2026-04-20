@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getSessionId } from "@/lib/checkout";
+import { notifyCartUpdated } from "@/lib/cartClient";
 import Container from "@/components/ui/Container";
+import PageSkeleton from "@/components/PageSkeleton";
 import { ButtonLink } from "@/components/ui/Button";
 import { QuantityStepper } from "@/components/QuantityStepper";
 
@@ -65,6 +67,7 @@ export default function CartPage() {
         method: "DELETE",
       });
       await refreshCart();
+      notifyCartUpdated();
     } finally {
       setUpdatingId(null);
     }
@@ -80,21 +83,14 @@ export default function CartPage() {
         body: JSON.stringify({ sessionId, quantity: nextQty }),
       });
       await refreshCart();
+      notifyCartUpdated();
     } finally {
       setUpdatingId(null);
     }
   }
 
   if (loading) {
-    return (
-      <main className="bg-white">
-        <Container>
-          <div className="py-14">
-            <p className="text-zinc-600">Loading cart...</p>
-          </div>
-        </Container>
-      </main>
-    );
+    return <PageSkeleton />;
   }
 
   const items = cart?.items || [];

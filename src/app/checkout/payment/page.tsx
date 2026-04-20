@@ -12,6 +12,7 @@ import {
   SHIPPING_METHODS,
 } from "@/lib/checkout";
 import { getAuthedUserId } from "@/lib/auth";
+import { notifyCartUpdated } from "@/lib/cartClient";
 import Container from "@/components/ui/Container";
 import { Button, ButtonLink } from "@/components/ui/Button";
 
@@ -85,6 +86,7 @@ export default function PaymentPage() {
       clearShippingAddress();
       clearShippingMethod();
       await fetch(`/api/cart?sessionId=${getSessionId()}`, { method: "DELETE" });
+      notifyCartUpdated();
       router.push(`/order-confirmation/${data._id}`);
     } catch {
       setError("Something went wrong. Please try again.");

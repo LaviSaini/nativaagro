@@ -1,5 +1,5 @@
-import RouteFadeLoader from "@/components/RouteFadeLoader";
+import PageSkeleton from "@/components/PageSkeleton";
 
 export default function Loading() {
-  return <RouteFadeLoader />;
+  return <PageSkeleton />;
 }

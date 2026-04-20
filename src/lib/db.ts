@@ -16,11 +16,18 @@ export async function connectToDatabase(): Promise<Db> {
     return db;
   }
 
-  client = new MongoClient(uri);
-  await client.connect();
-  db = client.db("ecomapp");
-
-  return db;
+  try {
+    client = new MongoClient(uri);
+    await client.connect();
+    db = client.db("ecomapp");
+    console.log("Database connected successfully");
+    return db;
+  } catch (err) {
+    console.error("Database not connected:", err);
+    client = null;
+    db = null;
+    throw err;
+  }
 }
 
 export function getDb(): Db | null {

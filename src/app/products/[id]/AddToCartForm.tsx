@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, startTransition } from "react";
 import { getSessionId } from "@/lib/checkout";
+import { notifyCartUpdated } from "@/lib/cartClient";
 import { Button } from "@/components/ui/Button";
 import { QuantityStepper } from "@/components/QuantityStepper";
 
@@ -52,6 +53,7 @@ export default function AddToCartForm({ productId, maxStock }: Props) {
         setError(typeof j.error === "string" ? j.error : "Could not add to cart");
         return;
       }
+      notifyCartUpdated();
       startTransition(() => {
         router.push("/cart");
       });
