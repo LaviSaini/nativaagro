@@ -38,7 +38,7 @@ export default function Blogs({ posts }: { posts: HomeBlogPost[] }) {
               <h2 className="text-4xl font-semibold tracking-tight text-[color:var(--ink)] md:text-5xl">
                 Featured Blogs
               </h2>
-              <p className="mt-3 max-w-xl text-base text-[color:var(--text)]">
+              <p className="mt-3 max-w-xxl text-base text-[color:var(--text)]">
                 Stories from nature—your go-to resource for wellness wisdom and industry updates.
               </p>
             </div>
@@ -53,7 +53,7 @@ export default function Blogs({ posts }: { posts: HomeBlogPost[] }) {
 
           {posts.length === 0 ? (
             <div className="mt-10 rounded-2xl border border-zinc-200 bg-zinc-50 p-10 text-sm text-zinc-600">
-              No blog posts yet. Add posts in the admin or run <code className="rounded bg-zinc-200 px-1">npm run seed:demo</code>.
+              No blog posts yet. Check back soon!
             </div>
           ) : (
             <div className="mt-10 grid gap-8 md:grid-cols-3">
